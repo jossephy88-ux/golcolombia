@@ -8,7 +8,7 @@ API_URL = "https://api.football-data.org/v4"
 HEADERS = {"X-Auth-Token": API_KEY.replace(" ", "")}
 
 # ID de la Liga BetPlay Colombia
-LIGA_ID = 2342
+LIGA_ID = 2021
 
 @app.route("/")
 def index():
