@@ -9,67 +9,43 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GolColombia">
 <link rel="manifest" href="/static/manifest.json">
-<link rel="apple-touch-icon" href="/static/icon.png">
 <title>GolColombia — Resultados en Vivo</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; background: #f0f0f0; color: #333; }
 
-  .header-top {
-    background: #003087; color: white;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 16px;
-  }
+  .header-top { background: #003087; color: white; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
   .logo { display: flex; align-items: center; gap: 8px; }
   .logo h1 { font-size: 1.2em; font-weight: bold; }
   .logo span { color: #FDD835; }
+  .notif-btn { background: none; border: 1.5px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8em; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .notif-btn.activo { background: #FDD835; color: #003087; border-color: #FDD835; font-weight: bold; }
 
-  .ligas-scroll {
-    background: #002070; padding: 8px 16px;
-    display: flex; gap: 8px; overflow-x: auto;
-    scrollbar-width: none;
-  }
+  .ligas-scroll { background: #002070; padding: 8px 16px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
   .ligas-scroll::-webkit-scrollbar { display: none; }
-  .liga-btn {
-    background: none; border: 1.5px solid rgba(255,255,255,0.3);
-    color: rgba(255,255,255,0.7); padding: 6px 14px;
-    border-radius: 20px; font-size: 0.8em; cursor: pointer;
-    white-space: nowrap; transition: all 0.2s;
-  }
-  .liga-btn.activo {
-    background: #FDD835; color: #003087;
-    border-color: #FDD835; font-weight: bold;
-  }
+  .liga-btn { background: none; border: 1.5px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); padding: 6px 14px; border-radius: 20px; font-size: 0.8em; cursor: pointer; white-space: nowrap; }
+  .liga-btn.activo { background: #FDD835; color: #003087; border-color: #FDD835; font-weight: bold; }
 
-  .tabs {
-    background: #003087; display: flex;
-    border-top: 1px solid rgba(255,255,255,0.1);
-  }
-  .tab {
-    flex: 1; padding: 11px; color: rgba(255,255,255,0.7);
-    cursor: pointer; font-size: 0.85em; font-weight: bold;
-    border-bottom: 3px solid transparent; border: none;
-    background: none; text-align: center;
-  }
+  .tabs { background: #003087; display: flex; border-top: 1px solid rgba(255,255,255,0.1); }
+  .tab { flex: 1; padding: 11px; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.85em; font-weight: bold; border-bottom: 3px solid transparent; border: none; background: none; text-align: center; }
   .tab.activo { color: #FDD835; border-bottom: 3px solid #FDD835; }
 
   .container { max-width: 800px; margin: 0 auto; padding: 16px; }
   .seccion { display: none; }
   .seccion.visible { display: block; }
 
-  .partido {
-    background: white; border-radius: 10px; padding: 14px;
-    margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    display: flex; align-items: center; justify-content: space-between;
-  }
+  .partido { background: white; border-radius: 10px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.1s; }
+  .partido:hover { transform: scale(1.01); }
+  .partido.live-partido { border-left: 4px solid #e53935; }
   .equipo { display: flex; align-items: center; gap: 8px; flex: 1; }
   .equipo.derecha { flex-direction: row-reverse; }
   .equipo img { width: 28px; height: 28px; object-fit: contain; }
   .equipo-nombre { font-size: 0.85em; font-weight: bold; }
   .marcador { text-align: center; min-width: 70px; }
-  .marcador .score { font-size: 1.3em; font-weight: bold; color: #003087; }
-  .marcador .hora { font-size: 0.7em; color: #888; display: block; }
-  .marcador .live { font-size: 0.7em; color: #e53935; font-weight: bold; display: block; }
+  .score { font-size: 1.3em; font-weight: bold; color: #003087; display: block; }
+  .hora { font-size: 0.7em; color: #888; display: block; }
+  .live { font-size: 0.7em; color: #e53935; font-weight: bold; display: block; animation: pulso 1s infinite; }
+  @keyframes pulso { 0%,100%{opacity:1} 50%{opacity:0.5} }
   .badge { display: inline-block; font-size: 0.65em; padding: 2px 7px; border-radius: 10px; margin-top: 3px; }
   .badge-live { background: #ffebee; color: #e53935; }
   .badge-fin { background: #e8f5e9; color: #2e7d32; }
@@ -94,12 +70,12 @@
   .gol-equipo { font-size: 0.75em; color: #888; margin-top: 2px; }
   .gol-count { font-size: 1.2em; font-weight: bold; color: #FDD835; background: #003087; padding: 5px 10px; border-radius: 8px; }
 
-  .instalar-banner {
-    background: #FDD835; color: #003087; padding: 12px 16px;
-    display: flex; align-items: center; justify-content: space-between;
-    font-size: 0.85em; font-weight: bold; display: none;
-  }
-  .instalar-banner button { background: #003087; color: #FDD835; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9em; }
+  .live-indicator { background: #e53935; color: white; text-align: center; padding: 6px; font-size: 0.8em; font-weight: bold; display: none; }
+  .live-indicator.visible { display: block; }
+
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #003087; color: white; padding: 12px 20px; border-radius: 10px; font-size: 0.9em; z-index: 9999; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-width: 90%; text-align: center; }
+  .toast.visible { display: block; animation: slideUp 0.3s ease; }
+  @keyframes slideUp { from{transform:translateX(-50%) translateY(20px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
 
   .cargando { text-align: center; padding: 40px; color: #888; }
   .error-msg { text-align: center; padding: 30px; color: #e53935; font-size: 0.9em; }
@@ -108,21 +84,20 @@
 </head>
 <body>
 
-<div id="instalar-banner" class="instalar-banner">
-  <span>⚽ Instala GolColombia en tu celular</span>
-  <button onclick="instalarApp()">Instalar</button>
-</div>
+<div id="live-indicator" class="live-indicator">⚽ HAY PARTIDOS EN VIVO AHORA</div>
 
 <div class="header-top">
   <div class="logo">
     <span style="font-size:1.5em">⚽</span>
     <h1>Gol<span>Colombia</span></h1>
   </div>
-  <span>🇨🇴</span>
+  <button class="notif-btn" id="notif-btn" onclick="toggleNotificaciones()">
+    🔔 Activar alertas
+  </button>
 </div>
 
 <div class="ligas-scroll">
-  <button class="liga-btn activo" onclick="cambiarLiga('premier', this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</button>
+  <button class="liga-btn activo" onclick="cambiarLiga('premier', this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier</button>
   <button class="liga-btn" onclick="cambiarLiga('laliga', this)">🇪🇸 La Liga</button>
   <button class="liga-btn" onclick="cambiarLiga('seriea', this)">🇮🇹 Serie A</button>
   <button class="liga-btn" onclick="cambiarLiga('bundesliga', this)">🇩🇪 Bundesliga</button>
@@ -147,31 +122,100 @@
   </div>
 </div>
 
+<div id="toast" class="toast"></div>
+
 <footer>GolColombia &copy; 2026 — Resultados en tiempo real</footer>
 
 <script>
 let ligaActual = "premier";
 let tabActual = "partidos";
-let deferredPrompt;
+let notifActivas = false;
+let marcadoresAnteriores = {};
+let intervaloActualizar = null;
 
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  document.getElementById("instalar-banner").style.display = "flex";
-});
+function mostrarToast(msg, tiempo = 3000) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("visible");
+  setTimeout(() => t.classList.remove("visible"), tiempo);
+}
 
-function instalarApp() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(() => {
-      deferredPrompt = null;
-      document.getElementById("instalar-banner").style.display = "none";
-    });
+async function toggleNotificaciones() {
+  if (!notifActivas) {
+    if (!("Notification" in window)) {
+      mostrarToast("Tu navegador no soporta notificaciones");
+      return;
+    }
+    const permiso = await Notification.requestPermission();
+    if (permiso === "granted") {
+      notifActivas = true;
+      document.getElementById("notif-btn").className = "notif-btn activo";
+      document.getElementById("notif-btn").textContent = "🔔 Alertas activas";
+      mostrarToast("✅ Alertas de goles activadas!");
+      iniciarMonitoreo();
+    } else {
+      mostrarToast("❌ Permiso de notificaciones denegado");
+    }
+  } else {
+    notifActivas = false;
+    document.getElementById("notif-btn").className = "notif-btn";
+    document.getElementById("notif-btn").textContent = "🔔 Activar alertas";
+    if (intervaloActualizar) clearInterval(intervaloActualizar);
+    mostrarToast("Alertas desactivadas");
   }
+}
+
+function iniciarMonitoreo() {
+  verificarGoles();
+  intervaloActualizar = setInterval(verificarGoles, 60000);
+}
+
+async function verificarGoles() {
+  try {
+    const res = await fetch(`/api/partidos/${ligaActual}`);
+    const data = await res.json();
+    if (!data.matches) return;
+
+    let hayLive = false;
+    data.matches.forEach(p => {
+      if (p.status === "IN_PLAY" || p.status === "PAUSED") {
+        hayLive = true;
+        const id = p.id;
+        const golesLocal = p.score.fullTime.home ?? 0;
+        const golesVisita = p.score.fullTime.away ?? 0;
+        const key = `${id}`;
+
+        if (marcadoresAnteriores[key] !== undefined) {
+          const ant = marcadoresAnteriores[key];
+          if (golesLocal > ant.local) {
+            enviarNotificacion(`⚽ GOL de ${p.homeTeam.shortName || p.homeTeam.name}!`, `${p.homeTeam.shortName} ${golesLocal} - ${golesVisita} ${p.awayTeam.shortName}`);
+          }
+          if (golesVisita > ant.visita) {
+            enviarNotificacion(`⚽ GOL de ${p.awayTeam.shortName || p.awayTeam.name}!`, `${p.homeTeam.shortName} ${golesLocal} - ${golesVisita} ${p.awayTeam.shortName}`);
+          }
+        }
+        marcadoresAnteriores[key] = { local: golesLocal, visita: golesVisita };
+      }
+    });
+
+    const ind = document.getElementById("live-indicator");
+    if (hayLive) ind.classList.add("visible");
+    else ind.classList.remove("visible");
+
+    if (tabActual === "partidos") cargarPartidos();
+  } catch(e) {}
+}
+
+function enviarNotificacion(titulo, cuerpo) {
+  if (notifActivas && Notification.permission === "granted") {
+    new Notification(titulo, { body: cuerpo, icon: "/static/icon.png" });
+  }
+  mostrarToast(`${titulo} — ${cuerpo}`, 5000);
 }
 
 function cambiarLiga(liga, btn) {
   ligaActual = liga;
+  marcadoresAnteriores = {};
   document.querySelectorAll(".liga-btn").forEach(b => b.classList.remove("activo"));
   btn.classList.add("activo");
   cargarSeccion(tabActual);
@@ -203,7 +247,7 @@ async function cargarPartidos() {
     const res = await fetch(`/api/partidos/${ligaActual}`);
     const data = await res.json();
     if (!data.matches || data.matches.length === 0) {
-      el.innerHTML = `<div class="error-msg">No hay partidos disponibles para esta liga.</div>`;
+      el.innerHTML = `<div class="error-msg">No hay partidos esta semana para esta liga.</div>`;
       return;
     }
     let html = "";
@@ -218,9 +262,10 @@ async function cargarPartidos() {
       const visita = p.awayTeam.shortName || p.awayTeam.name;
       const logoL = p.homeTeam.crest || "";
       const logoV = p.awayTeam.crest || "";
+      const esLive = p.status === "IN_PLAY" || p.status === "PAUSED";
       let score = `<span class="hora">${formatHora(p.utcDate)}</span>`;
-      let badge = `<span class="badge badge-prox">Próximo</span>`;
-      if (p.status === "IN_PLAY" || p.status === "PAUSED") {
+      let badge = `<span class="badge badge-prox">Proximo</span>`;
+      if (esLive) {
         score = `<span class="score">${p.score.fullTime.home ?? 0} - ${p.score.fullTime.away ?? 0}</span><span class="live">EN VIVO</span>`;
         badge = `<span class="badge badge-live">LIVE</span>`;
       } else if (p.status === "FINISHED") {
@@ -228,7 +273,7 @@ async function cargarPartidos() {
         badge = `<span class="badge badge-fin">Final</span>`;
       }
       html += `
-        <div class="partido">
+        <div class="partido ${esLive ? 'live-partido' : ''}">
           <div class="equipo">
             <img src="${logoL}" onerror="this.style.display='none'" alt="">
             <span class="equipo-nombre">${local}</span>
@@ -242,7 +287,7 @@ async function cargarPartidos() {
     });
     el.innerHTML = html;
   } catch(e) {
-    el.innerHTML = `<div class="error-msg">Error de conexion. Intenta mas tarde.</div>`;
+    el.innerHTML = `<div class="error-msg">Error de conexion.</div>`;
   }
 }
 
@@ -323,6 +368,7 @@ if ("serviceWorker" in navigator) {
 }
 
 cargarPartidos();
+setInterval(() => { if (tabActual === "partidos") cargarPartidos(); }, 60000);
 </script>
 </body>
 </html>
