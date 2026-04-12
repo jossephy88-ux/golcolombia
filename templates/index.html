@@ -3,154 +3,182 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GolColombia — Resultados Liga BetPlay</title>
+<meta name="theme-color" content="#003087">
+<meta name="description" content="GolColombia - Resultados de futbol en tiempo real">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GolColombia">
+<link rel="manifest" href="/static/manifest.json">
+<link rel="apple-touch-icon" href="/static/icon.png">
+<title>GolColombia — Resultados en Vivo</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; }
+  body { font-family: Arial, sans-serif; background: #f0f0f0; color: #333; }
 
-  header {
-    background: linear-gradient(135deg, #FDD835, #F9A825);
-    padding: 0; border-bottom: 4px solid #003087;
-  }
   .header-top {
     background: #003087; color: white;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 20px;
+    padding: 12px 16px;
   }
-  .logo { display: flex; align-items: center; gap: 10px; }
-  .logo .icon { font-size: 1.8em; }
-  .logo h1 { font-size: 1.3em; font-weight: bold; letter-spacing: 1px; }
+  .logo { display: flex; align-items: center; gap: 8px; }
+  .logo h1 { font-size: 1.2em; font-weight: bold; }
   .logo span { color: #FDD835; }
-  .bandera { font-size: 1.5em; }
+
+  .ligas-scroll {
+    background: #002070; padding: 8px 16px;
+    display: flex; gap: 8px; overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .ligas-scroll::-webkit-scrollbar { display: none; }
+  .liga-btn {
+    background: none; border: 1.5px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.7); padding: 6px 14px;
+    border-radius: 20px; font-size: 0.8em; cursor: pointer;
+    white-space: nowrap; transition: all 0.2s;
+  }
+  .liga-btn.activo {
+    background: #FDD835; color: #003087;
+    border-color: #FDD835; font-weight: bold;
+  }
 
   .tabs {
-    display: flex; background: #003087;
+    background: #003087; display: flex;
     border-top: 1px solid rgba(255,255,255,0.1);
   }
   .tab {
-    padding: 12px 20px; color: rgba(255,255,255,0.7);
-    cursor: pointer; font-size: 0.9em; font-weight: bold;
-    border-bottom: 3px solid transparent; transition: all 0.2s;
-    border: none; background: none; letter-spacing: 0.5px;
+    flex: 1; padding: 11px; color: rgba(255,255,255,0.7);
+    cursor: pointer; font-size: 0.85em; font-weight: bold;
+    border-bottom: 3px solid transparent; border: none;
+    background: none; text-align: center;
   }
   .tab.activo { color: #FDD835; border-bottom: 3px solid #FDD835; }
-  .tab:hover { color: white; }
 
-  .container { max-width: 800px; margin: 0 auto; padding: 20px 16px; }
-
+  .container { max-width: 800px; margin: 0 auto; padding: 16px; }
   .seccion { display: none; }
   .seccion.visible { display: block; }
 
-  /* PARTIDOS */
-  .jornada-titulo {
-    font-size: 0.8em; font-weight: bold; color: #888;
-    letter-spacing: 1px; text-transform: uppercase;
-    padding: 10px 0 6px; margin-top: 15px;
-  }
   .partido {
-    background: white; border-radius: 10px; padding: 15px;
-    margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    background: white; border-radius: 10px; padding: 14px;
+    margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     display: flex; align-items: center; justify-content: space-between;
   }
   .equipo { display: flex; align-items: center; gap: 8px; flex: 1; }
   .equipo.derecha { flex-direction: row-reverse; }
-  .equipo img { width: 30px; height: 30px; object-fit: contain; }
-  .equipo-nombre { font-size: 0.9em; font-weight: bold; color: #333; }
-  .marcador {
-    text-align: center; min-width: 70px;
-    font-size: 1.3em; font-weight: bold; color: #003087;
-  }
-  .marcador .hora { font-size: 0.65em; color: #888; font-weight: normal; display: block; }
-  .marcador .live { font-size: 0.65em; color: #e53935; font-weight: bold; display: block; }
-  .badge-estado {
-    display: inline-block; font-size: 0.7em; padding: 2px 8px;
-    border-radius: 10px; margin-top: 4px;
-  }
+  .equipo img { width: 28px; height: 28px; object-fit: contain; }
+  .equipo-nombre { font-size: 0.85em; font-weight: bold; }
+  .marcador { text-align: center; min-width: 70px; }
+  .marcador .score { font-size: 1.3em; font-weight: bold; color: #003087; }
+  .marcador .hora { font-size: 0.7em; color: #888; display: block; }
+  .marcador .live { font-size: 0.7em; color: #e53935; font-weight: bold; display: block; }
+  .badge { display: inline-block; font-size: 0.65em; padding: 2px 7px; border-radius: 10px; margin-top: 3px; }
   .badge-live { background: #ffebee; color: #e53935; }
   .badge-fin { background: #e8f5e9; color: #2e7d32; }
   .badge-prox { background: #e3f2fd; color: #1565c0; }
+  .fecha-titulo { font-size: 0.75em; font-weight: bold; color: #888; letter-spacing: 1px; text-transform: uppercase; padding: 12px 0 6px; }
 
-  /* TABLA */
-  .tabla-wrap { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-  .tabla-header {
-    background: #003087; color: white;
-    display: grid; grid-template-columns: 40px 1fr 40px 40px 40px 40px 40px 50px;
-    padding: 10px 15px; font-size: 0.75em; font-weight: bold; gap: 5px;
-    text-align: center;
-  }
-  .tabla-header .nombre-col { text-align: left; }
-  .tabla-fila {
-    display: grid; grid-template-columns: 40px 1fr 40px 40px 40px 40px 40px 50px;
-    padding: 10px 15px; font-size: 0.85em; gap: 5px;
-    border-bottom: 1px solid #f0f0f0; align-items: center;
-    text-align: center;
-  }
+  .tabla-wrap { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+  .tabla-header { background: #003087; color: white; display: grid; grid-template-columns: 36px 1fr 36px 36px 36px 36px 36px 44px; padding: 10px 12px; font-size: 0.72em; font-weight: bold; text-align: center; gap: 4px; }
+  .tabla-header .nc { text-align: left; }
+  .tabla-fila { display: grid; grid-template-columns: 36px 1fr 36px 36px 36px 36px 36px 44px; padding: 9px 12px; font-size: 0.82em; gap: 4px; border-bottom: 1px solid #f0f0f0; align-items: center; text-align: center; }
   .tabla-fila:hover { background: #f9f9f9; }
-  .tabla-fila.top3 { background: #e8f5e9; }
-  .tabla-fila.descenso { background: #ffebee; }
-  .pos { font-weight: bold; color: #003087; }
-  .equipo-tabla { display: flex; align-items: center; gap: 8px; text-align: left; }
-  .equipo-tabla img { width: 22px; height: 22px; object-fit: contain; }
+  .tabla-fila.top { background: #e8f5e9; }
+  .tabla-fila.desc { background: #ffebee; }
+  .equipo-tabla { display: flex; align-items: center; gap: 6px; text-align: left; }
+  .equipo-tabla img { width: 20px; height: 20px; object-fit: contain; }
   .pts { font-weight: bold; color: #003087; }
 
-  /* GOLEADORES */
-  .goleador {
-    background: white; border-radius: 10px; padding: 15px;
-    margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    display: flex; align-items: center; gap: 15px;
-  }
-  .gol-pos { font-size: 1.2em; font-weight: bold; color: #003087; min-width: 30px; text-align: center; }
+  .goleador { background: white; border-radius: 10px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 14px; }
+  .gol-pos { font-size: 1.1em; font-weight: bold; color: #003087; min-width: 28px; text-align: center; }
   .gol-info { flex: 1; }
-  .gol-nombre { font-weight: bold; font-size: 0.95em; }
-  .gol-equipo { font-size: 0.8em; color: #888; margin-top: 2px; }
-  .gol-count { font-size: 1.4em; font-weight: bold; color: #FDD835; background: #003087; padding: 6px 12px; border-radius: 8px; }
+  .gol-nombre { font-weight: bold; font-size: 0.9em; }
+  .gol-equipo { font-size: 0.75em; color: #888; margin-top: 2px; }
+  .gol-count { font-size: 1.2em; font-weight: bold; color: #FDD835; background: #003087; padding: 5px 10px; border-radius: 8px; }
+
+  .instalar-banner {
+    background: #FDD835; color: #003087; padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.85em; font-weight: bold; display: none;
+  }
+  .instalar-banner button { background: #003087; color: #FDD835; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.9em; }
 
   .cargando { text-align: center; padding: 40px; color: #888; }
   .error-msg { text-align: center; padding: 30px; color: #e53935; font-size: 0.9em; }
-
-  footer { text-align: center; padding: 25px; color: #aaa; font-size: 0.8em; margin-top: 10px; }
+  footer { text-align: center; padding: 20px; color: #aaa; font-size: 0.75em; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="header-top">
-    <div class="logo">
-      <div class="icon">⚽</div>
-      <h1>Gol<span>Colombia</span></h1>
-    </div>
-    <div class="bandera">🇨🇴</div>
+<div id="instalar-banner" class="instalar-banner">
+  <span>⚽ Instala GolColombia en tu celular</span>
+  <button onclick="instalarApp()">Instalar</button>
+</div>
+
+<div class="header-top">
+  <div class="logo">
+    <span style="font-size:1.5em">⚽</span>
+    <h1>Gol<span>Colombia</span></h1>
   </div>
-  <div class="tabs">
-    <button class="tab activo" onclick="cambiarTab('partidos', this)">Partidos</button>
-    <button class="tab" onclick="cambiarTab('tabla', this)">Tabla</button>
-    <button class="tab" onclick="cambiarTab('goleadores', this)">Goleadores</button>
-  </div>
-</header>
+  <span>🇨🇴</span>
+</div>
+
+<div class="ligas-scroll">
+  <button class="liga-btn activo" onclick="cambiarLiga('premier', this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</button>
+  <button class="liga-btn" onclick="cambiarLiga('laliga', this)">🇪🇸 La Liga</button>
+  <button class="liga-btn" onclick="cambiarLiga('seriea', this)">🇮🇹 Serie A</button>
+  <button class="liga-btn" onclick="cambiarLiga('bundesliga', this)">🇩🇪 Bundesliga</button>
+  <button class="liga-btn" onclick="cambiarLiga('champions', this)">🇪🇺 Champions</button>
+</div>
+
+<div class="tabs">
+  <button class="tab activo" onclick="cambiarTab('partidos', this)">Partidos</button>
+  <button class="tab" onclick="cambiarTab('tabla', this)">Tabla</button>
+  <button class="tab" onclick="cambiarTab('goleadores', this)">Goleadores</button>
+</div>
 
 <div class="container">
-
-  <!-- PARTIDOS -->
   <div id="partidos" class="seccion visible">
     <div id="partidos-contenido" class="cargando">Cargando partidos...</div>
   </div>
-
-  <!-- TABLA -->
   <div id="tabla" class="seccion">
     <div id="tabla-contenido" class="cargando">Cargando tabla...</div>
   </div>
-
-  <!-- GOLEADORES -->
   <div id="goleadores" class="seccion">
     <div id="goleadores-contenido" class="cargando">Cargando goleadores...</div>
   </div>
-
 </div>
 
-<footer>GolColombia &copy; 2026 — Liga BetPlay Dimayor</footer>
+<footer>GolColombia &copy; 2026 — Resultados en tiempo real</footer>
 
 <script>
+let ligaActual = "premier";
+let tabActual = "partidos";
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById("instalar-banner").style.display = "flex";
+});
+
+function instalarApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      document.getElementById("instalar-banner").style.display = "none";
+    });
+  }
+}
+
+function cambiarLiga(liga, btn) {
+  ligaActual = liga;
+  document.querySelectorAll(".liga-btn").forEach(b => b.classList.remove("activo"));
+  btn.classList.add("activo");
+  cargarSeccion(tabActual);
+}
+
 function cambiarTab(nombre, btn) {
+  tabActual = nombre;
   document.querySelectorAll(".seccion").forEach(s => s.classList.remove("visible"));
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("activo"));
   document.getElementById(nombre).classList.add("visible");
@@ -160,60 +188,54 @@ function cambiarTab(nombre, btn) {
 
 function formatHora(fecha) {
   if (!fecha) return "";
-  const d = new Date(fecha);
-  return d.toLocaleTimeString("es-CO", {hour:"2-digit", minute:"2-digit"});
+  return new Date(fecha).toLocaleTimeString("es-CO", {hour:"2-digit", minute:"2-digit"});
 }
 
 function formatFecha(fecha) {
   if (!fecha) return "";
-  const d = new Date(fecha);
-  return d.toLocaleDateString("es-CO", {weekday:"long", day:"numeric", month:"long"});
+  return new Date(fecha).toLocaleDateString("es-CO", {weekday:"long", day:"numeric", month:"long"});
 }
 
 async function cargarPartidos() {
   const el = document.getElementById("partidos-contenido");
+  el.innerHTML = `<div class="cargando">Cargando partidos...</div>`;
   try {
-    const res = await fetch("/api/partidos");
+    const res = await fetch(`/api/partidos/${ligaActual}`);
     const data = await res.json();
-    if (data.error || !data.matches) {
-      el.innerHTML = `<div class="error-msg">No se pudieron cargar los partidos.<br>Intenta mas tarde.</div>`;
-      return;
-    }
-    const partidos = data.matches;
-    if (partidos.length === 0) {
-      el.innerHTML = `<div class="error-msg">No hay partidos disponibles.</div>`;
+    if (!data.matches || data.matches.length === 0) {
+      el.innerHTML = `<div class="error-msg">No hay partidos disponibles para esta liga.</div>`;
       return;
     }
     let html = "";
     let fechaActual = "";
-    partidos.forEach(p => {
+    data.matches.slice(0, 30).forEach(p => {
       const fecha = formatFecha(p.utcDate);
       if (fecha !== fechaActual) {
-        html += `<div class="jornada-titulo">${fecha}</div>`;
+        html += `<div class="fecha-titulo">${fecha}</div>`;
         fechaActual = fecha;
       }
       const local = p.homeTeam.shortName || p.homeTeam.name;
       const visita = p.awayTeam.shortName || p.awayTeam.name;
-      const logoLocal = p.homeTeam.crest || "";
-      const logoVisita = p.awayTeam.crest || "";
-      let marcador = `<span class="hora">${formatHora(p.utcDate)}</span>`;
-      let badge = `<span class="badge-estado badge-prox">Prox</span>`;
+      const logoL = p.homeTeam.crest || "";
+      const logoV = p.awayTeam.crest || "";
+      let score = `<span class="hora">${formatHora(p.utcDate)}</span>`;
+      let badge = `<span class="badge badge-prox">Próximo</span>`;
       if (p.status === "IN_PLAY" || p.status === "PAUSED") {
-        marcador = `${p.score.fullTime.home ?? 0} - ${p.score.fullTime.away ?? 0}<span class="live">EN VIVO</span>`;
-        badge = `<span class="badge-estado badge-live">LIVE</span>`;
+        score = `<span class="score">${p.score.fullTime.home ?? 0} - ${p.score.fullTime.away ?? 0}</span><span class="live">EN VIVO</span>`;
+        badge = `<span class="badge badge-live">LIVE</span>`;
       } else if (p.status === "FINISHED") {
-        marcador = `${p.score.fullTime.home} - ${p.score.fullTime.away}`;
-        badge = `<span class="badge-estado badge-fin">Final</span>`;
+        score = `<span class="score">${p.score.fullTime.home} - ${p.score.fullTime.away}</span>`;
+        badge = `<span class="badge badge-fin">Final</span>`;
       }
       html += `
         <div class="partido">
           <div class="equipo">
-            <img src="${logoLocal}" onerror="this.style.display='none'" alt="">
+            <img src="${logoL}" onerror="this.style.display='none'" alt="">
             <span class="equipo-nombre">${local}</span>
           </div>
-          <div class="marcador">${marcador}${badge}</div>
+          <div class="marcador">${score}${badge}</div>
           <div class="equipo derecha">
-            <img src="${logoVisita}" onerror="this.style.display='none'" alt="">
+            <img src="${logoV}" onerror="this.style.display='none'" alt="">
             <span class="equipo-nombre">${visita}</span>
           </div>
         </div>`;
@@ -226,44 +248,36 @@ async function cargarPartidos() {
 
 async function cargarTabla() {
   const el = document.getElementById("tabla-contenido");
+  el.innerHTML = `<div class="cargando">Cargando tabla...</div>`;
   try {
-    const res = await fetch("/api/tabla");
+    const res = await fetch(`/api/tabla/${ligaActual}`);
     const data = await res.json();
-    if (data.error || !data.standings) {
-      el.innerHTML = `<div class="error-msg">No se pudo cargar la tabla.</div>`;
+    if (!data.standings) {
+      el.innerHTML = `<div class="error-msg">No hay tabla disponible.</div>`;
       return;
     }
     const tabla = data.standings[0].table;
-    let html = `
-      <div class="tabla-wrap">
-        <div class="tabla-header">
-          <div>#</div>
-          <div class="nombre-col">Equipo</div>
-          <div>PJ</div><div>G</div><div>E</div><div>P</div><div>GD</div><div>PTS</div>
-        </div>`;
+    let html = `<div class="tabla-wrap">
+      <div class="tabla-header">
+        <div>#</div><div class="nc">Equipo</div>
+        <div>PJ</div><div>G</div><div>E</div><div>P</div><div>GD</div><div>PTS</div>
+      </div>`;
     tabla.forEach((e, i) => {
-      let clase = "";
-      if (i < 4) clase = "top3";
-      if (i >= tabla.length - 2) clase = "descenso";
+      let clase = i < 4 ? "top" : i >= tabla.length - 3 ? "desc" : "";
       html += `
         <div class="tabla-fila ${clase}">
-          <div class="pos">${e.position}</div>
+          <div>${e.position}</div>
           <div class="equipo-tabla">
             <img src="${e.team.crest}" onerror="this.style.display='none'" alt="">
             <span>${e.team.shortName || e.team.name}</span>
           </div>
-          <div>${e.playedGames}</div>
-          <div>${e.won}</div>
-          <div>${e.draw}</div>
-          <div>${e.lost}</div>
+          <div>${e.playedGames}</div><div>${e.won}</div>
+          <div>${e.draw}</div><div>${e.lost}</div>
           <div>${e.goalDifference > 0 ? '+' : ''}${e.goalDifference}</div>
           <div class="pts">${e.points}</div>
         </div>`;
     });
-    html += `</div>
-      <p style="font-size:0.75em;color:#aaa;padding:10px 5px;">
-        🟢 Clasificacion | 🔴 Descenso
-      </p>`;
+    html += `</div><p style="font-size:0.72em;color:#aaa;padding:8px 4px;">🟢 Clasificacion | 🔴 Descenso</p>`;
     el.innerHTML = html;
   } catch(e) {
     el.innerHTML = `<div class="error-msg">Error de conexion.</div>`;
@@ -272,11 +286,12 @@ async function cargarTabla() {
 
 async function cargarGoleadores() {
   const el = document.getElementById("goleadores-contenido");
+  el.innerHTML = `<div class="cargando">Cargando goleadores...</div>`;
   try {
-    const res = await fetch("/api/goleadores");
+    const res = await fetch(`/api/goleadores/${ligaActual}`);
     const data = await res.json();
-    if (data.error || !data.scorers) {
-      el.innerHTML = `<div class="error-msg">No se pudieron cargar los goleadores.</div>`;
+    if (!data.scorers) {
+      el.innerHTML = `<div class="error-msg">No hay goleadores disponibles.</div>`;
       return;
     }
     let html = "";
@@ -301,6 +316,10 @@ function cargarSeccion(nombre) {
   if (nombre === "partidos") cargarPartidos();
   else if (nombre === "tabla") cargarTabla();
   else if (nombre === "goleadores") cargarGoleadores();
+}
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/static/sw.js");
 }
 
 cargarPartidos();

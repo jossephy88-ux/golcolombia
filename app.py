@@ -8,39 +8,45 @@ API_URL = "https://api.football-data.org/v4"
 HEADERS = {"X-Auth-Token": API_KEY.replace(" ", "")}
 
 # ID de la Liga BetPlay Colombia
-LIGA_ID = 2021
+LIGAS = {
+    "premier": {"id": 2021, "nombre": "Premier League", "pais": "🏴󠁧󠁢󠁥󠁮󠁧󠁿"},
+    "laliga": {"id": 2014, "nombre": "La Liga", "pais": "🇪🇸"},
+    "seriea": {"id": 2019, "nombre": "Serie A", "pais": "🇮🇹"},
+    "bundesliga": {"id": 2002, "nombre": "Bundesliga", "pais": "🇩🇪"},
+    "champions": {"id": 2001, "nombre": "Champions League", "pais": "🇪🇺"},
+}
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
-@app.route("/api/partidos")
-def partidos():
+@app.route("/api/partidos/<liga>")
+def partidos(liga):
     try:
-        res = requests.get(f"{API_URL}/competitions/{LIGA_ID}/matches?status=SCHEDULED,LIVE,FINISHED", headers=HEADERS)
-        data = res.json()
-        return jsonify(data)
+        liga_id = LIGAS.get(liga, LIGAS["premier"])["id"]
+        res = requests.get(f"{API_URL}/competitions/{liga_id}/matches?status=SCHEDULED,LIVE,FINISHED", headers=HEADERS)
+        return jsonify(res.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/api/tabla")
-def tabla():
+@app.route("/api/tabla/<liga>")
+def tabla(liga):
     try:
-        res = requests.get(f"{API_URL}/competitions/{LIGA_ID}/standings", headers=HEADERS)
-        data = res.json()
-        return jsonify(data)
+        liga_id = LIGAS.get(liga, LIGAS["premier"])["id"]
+        res = requests.get(f"{API_URL}/competitions/{liga_id}/standings", headers=HEADERS)
+        return jsonify(res.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/api/goleadores")
-def goleadores():
+@app.route("/api/goleadores/<liga>")
+def goleadores(liga):
     try:
-        res = requests.get(f"{API_URL}/competitions/{LIGA_ID}/scorers", headers=HEADERS)
-        data = res.json()
-        return jsonify(data)
+        liga_id = LIGAS.get(liga, LIGAS["premier"])["id"]
+        res = requests.get(f"{API_URL}/competitions/{liga_id}/scorers", headers=HEADERS)
+        return jsonify(res.json())
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-if __name__ == "__main__":
-    print("GolColombia iniciado en http://localhost:5000")
-    app.run(host="0.0.0.0", port=5000, debug=True)
+@app.route("/api/ligas")
+def ligas():
+    return jsonify(LIGAS)
