@@ -11,29 +11,24 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; background: #f0f0f0; color: #333; }
-
   .header-top { background: #003087; color: white; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
   .logo { display: flex; align-items: center; gap: 8px; }
   .logo h1 { font-size: 1.2em; font-weight: bold; }
   .logo span { color: #FDD835; }
   .notif-btn { background: none; border: 1.5px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8em; cursor: pointer; }
   .notif-btn.activo { background: #FDD835; color: #003087; border-color: #FDD835; font-weight: bold; }
-
   .ligas-scroll { background: #002070; padding: 8px 16px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
   .ligas-scroll::-webkit-scrollbar { display: none; }
   .liga-btn { background: none; border: 1.5px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); padding: 6px 14px; border-radius: 20px; font-size: 0.8em; cursor: pointer; white-space: nowrap; }
   .liga-btn.activo { background: #FDD835; color: #003087; border-color: #FDD835; font-weight: bold; }
-
   .tabs { background: #003087; display: flex; border-top: 1px solid rgba(255,255,255,0.1); }
   .tab { flex: 1; padding: 11px; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.85em; font-weight: bold; border: none; background: none; text-align: center; border-bottom: 3px solid transparent; }
   .tab.activo { color: #FDD835; border-bottom: 3px solid #FDD835; }
-
   .container { max-width: 800px; margin: 0 auto; padding: 16px; }
   .seccion { display: none; }
   .seccion.visible { display: block; }
-
-  .partido { background: white; border-radius: 10px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); cursor: pointer; transition: transform 0.1s; }
-  .partido:hover { transform: scale(1.01); }
+  .partido { background: white; border-radius: 10px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); cursor: pointer; }
+  .partido:hover { background: #fafafa; }
   .partido.live-partido { border-left: 4px solid #e53935; }
   .partido-top { display: flex; align-items: center; justify-content: space-between; }
   .equipo { display: flex; align-items: center; gap: 8px; flex: 1; }
@@ -50,25 +45,23 @@
   .badge-fin { background: #e8f5e9; color: #2e7d32; }
   .badge-prox { background: #e3f2fd; color: #1565c0; }
   .fecha-titulo { font-size: 0.75em; font-weight: bold; color: #888; letter-spacing: 1px; text-transform: uppercase; padding: 12px 0 6px; }
-
-  /* PREDICCION IA */
   .prediccion-box { margin-top: 12px; border-top: 1px solid #f0f0f0; padding-top: 12px; display: none; }
   .prediccion-box.visible { display: block; }
-  .btn-prediccion { width: 100%; padding: 8px; background: linear-gradient(135deg, #003087, #0056b3); color: white; border: none; border-radius: 8px; font-size: 0.85em; cursor: pointer; font-weight: bold; margin-top: 10px; }
+  .btn-prediccion { width: 100%; padding: 9px; background: #003087; color: white; border: none; border-radius: 8px; font-size: 0.85em; cursor: pointer; font-weight: bold; }
   .btn-prediccion:disabled { opacity: 0.6; cursor: not-allowed; }
-  .prediccion-resultado { background: linear-gradient(135deg, #f8f9ff, #e8f0ff); border-radius: 10px; padding: 14px; margin-top: 10px; border-left: 4px solid #003087; }
-  .prediccion-resultado h4 { color: #003087; font-size: 0.9em; margin-bottom: 8px; }
-  .prediccion-resultado p { font-size: 0.85em; color: #444; line-height: 1.6; }
-  .prediccion-cargando { text-align: center; padding: 15px; color: #888; font-size: 0.85em; }
-  .barras { display: flex; gap: 8px; margin: 10px 0; align-items: center; }
-  .barra-wrap { flex: 1; }
-  .barra-label { font-size: 0.75em; color: #666; margin-bottom: 3px; }
-  .barra { height: 8px; border-radius: 4px; }
-  .barra-local { background: #003087; }
-  .barra-empate { background: #888; }
-  .barra-visita { background: #e53935; }
-  .barra-pct { font-size: 0.8em; font-weight: bold; text-align: center; }
-
+  .prediccion-resultado { background: #f0f4ff; border-radius: 10px; padding: 14px; margin-top: 10px; border-left: 4px solid #003087; }
+  .pred-titulo { font-size: 1em; font-weight: bold; color: #003087; margin-bottom: 10px; }
+  .barras-wrap { margin: 10px 0; }
+  .barra-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .barra-label { font-size: 0.75em; color: #555; min-width: 80px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+  .barra-bg { flex: 1; background: #e0e0e0; border-radius: 4px; height: 10px; }
+  .barra-fill { height: 10px; border-radius: 4px; }
+  .barra-local-fill { background: #003087; }
+  .barra-empate-fill { background: #888; }
+  .barra-visita-fill { background: #e53935; }
+  .barra-pct { font-size: 0.8em; font-weight: bold; min-width: 35px; text-align: right; }
+  .pred-info { font-size: 0.82em; color: #555; margin-top: 8px; line-height: 1.5; }
+  .pred-marcador { font-size: 1.1em; font-weight: bold; color: #003087; text-align: center; margin-top: 8px; padding: 8px; background: white; border-radius: 8px; }
   .tabla-wrap { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
   .tabla-header { background: #003087; color: white; display: grid; grid-template-columns: 36px 1fr 36px 36px 36px 36px 36px 44px; padding: 10px 12px; font-size: 0.72em; font-weight: bold; text-align: center; gap: 4px; }
   .tabla-header .nc { text-align: left; }
@@ -79,30 +72,24 @@
   .equipo-tabla { display: flex; align-items: center; gap: 6px; text-align: left; }
   .equipo-tabla img { width: 20px; height: 20px; object-fit: contain; }
   .pts { font-weight: bold; color: #003087; }
-
   .goleador { background: white; border-radius: 10px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 14px; }
   .gol-pos { font-size: 1.1em; font-weight: bold; color: #003087; min-width: 28px; text-align: center; }
   .gol-info { flex: 1; }
   .gol-nombre { font-weight: bold; font-size: 0.9em; }
   .gol-equipo { font-size: 0.75em; color: #888; margin-top: 2px; }
   .gol-count { font-size: 1.2em; font-weight: bold; color: #FDD835; background: #003087; padding: 5px 10px; border-radius: 8px; }
-
   .live-indicator { background: #e53935; color: white; text-align: center; padding: 6px; font-size: 0.8em; font-weight: bold; display: none; }
   .live-indicator.visible { display: block; }
-
   .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #003087; color: white; padding: 12px 20px; border-radius: 10px; font-size: 0.9em; z-index: 9999; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-width: 90%; text-align: center; }
   .toast.visible { display: block; }
-
   .cargando { text-align: center; padding: 40px; color: #888; }
   .error-msg { text-align: center; padding: 30px; color: #e53935; font-size: 0.9em; }
   footer { text-align: center; padding: 20px; color: #aaa; font-size: 0.75em; }
-  .ia-badge { display: inline-block; background: linear-gradient(135deg, #003087, #0056b3); color: white; font-size: 0.7em; padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
 </style>
 </head>
 <body>
 
 <div id="live-indicator" class="live-indicator">⚽ HAY PARTIDOS EN VIVO AHORA</div>
-
 <div class="header-top">
   <div class="logo">
     <span style="font-size:1.5em">⚽</span>
@@ -110,7 +97,6 @@
   </div>
   <button class="notif-btn" id="notif-btn" onclick="toggleNotificaciones()">🔔 Alertas</button>
 </div>
-
 <div class="ligas-scroll">
   <button class="liga-btn activo" onclick="cambiarLiga('premier', this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier</button>
   <button class="liga-btn" onclick="cambiarLiga('laliga', this)">🇪🇸 La Liga</button>
@@ -118,7 +104,6 @@
   <button class="liga-btn" onclick="cambiarLiga('bundesliga', this)">🇩🇪 Bundesliga</button>
   <button class="liga-btn" onclick="cambiarLiga('champions', this)">🇪🇺 Champions</button>
 </div>
-
 <div class="tabs">
   <button class="tab activo" onclick="cambiarTab('partidos', this)">Partidos</button>
   <button class="tab" onclick="cambiarTab('tabla', this)">Tabla</button>
@@ -146,6 +131,7 @@ let tabActual = "partidos";
 let notifActivas = false;
 let marcadoresAnteriores = {};
 let prediccionesCache = {};
+let statsTabla = {};
 
 function mostrarToast(msg, tiempo = 3000) {
   const t = document.getElementById("toast");
@@ -171,64 +157,69 @@ async function toggleNotificaciones() {
   }
 }
 
-async function pedirPrediccion(partidoId, local, visita, posLocal, posVisita, pjLocal, pjVisita, ganLocal, ganVisita, btnId, resultId) {
-  if (prediccionesCache[partidoId]) {
-    document.getElementById(resultId).innerHTML = prediccionesCache[partidoId];
-    return;
-  }
-  const btn = document.getElementById(btnId);
-  const resEl = document.getElementById(resultId);
-  btn.disabled = true;
-  btn.textContent = "Analizando...";
-  resEl.innerHTML = `<div class="prediccion-cargando">🤖 La IA esta analizando el partido...</div>`;
-
-  try {
-    const prompt = `Eres un analista experto de futbol. Analiza este partido y da una prediccion breve:
-
-Partido: ${local} vs ${visita}
-${local}: Posicion ${posLocal} en la tabla, ${ganLocal} victorias en ${pjLocal} partidos
-${visita}: Posicion ${posVisita} en la tabla, ${ganVisita} victorias en ${pjVisita} partidos
-
-Responde en este formato exacto (maximo 4 lineas):
-🏆 PREDICCION: [quien gana o empate] ([porcentaje]%)
-📊 ${local}: [porcentaje]% | Empate: [porcentaje]% | ${visita}: [porcentaje]%
-⚡ RAZON: [explicacion breve de 1 linea]
-⚽ MARCADOR PROBABLE: [X-X]`;
-
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 200,
-        messages: [{ role: "user", content: prompt }]
-      })
-    });
-    const data = await res.json();
-    const texto = data.content[0].text;
-    const lineas = texto.split("\n").filter(l => l.trim());
-    let html = `<div class="prediccion-resultado">
-      <h4>🤖 Prediccion IA<span class="ia-badge">Beta</span></h4>`;
-    lineas.forEach(l => { html += `<p>${l}</p>`; });
-    html += `</div>`;
-    prediccionesCache[partidoId] = html;
-    resEl.innerHTML = html;
-    btn.textContent = "✅ Prediccion lista";
-  } catch(e) {
-    resEl.innerHTML = `<div class="prediccion-resultado"><p>Error al obtener prediccion. Intenta de nuevo.</p></div>`;
-    btn.disabled = false;
-    btn.textContent = "🤖 Predecir con IA";
-  }
-}
-
 function togglePrediccion(id) {
   const box = document.getElementById(`pred-${id}`);
   box.classList.toggle("visible");
 }
 
+async function pedirPrediccion(pid, local, visita, posL, posV, pjL, pjV, ganL, ganV, ptsL, ptsV, gfL, gfV) {
+  if (prediccionesCache[pid]) {
+    document.getElementById(`res-${pid}`).innerHTML = prediccionesCache[pid];
+    return;
+  }
+  const btn = document.getElementById(`btn-${pid}`);
+  const resEl = document.getElementById(`res-${pid}`);
+  btn.disabled = true;
+  btn.textContent = "Analizando...";
+  resEl.innerHTML = `<div style="text-align:center;padding:10px;color:#888;font-size:0.85em;">📊 Calculando prediccion...</div>`;
+
+  try {
+    const res = await fetch("/api/prediccion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ local, visita, posLocal: posL, posVisita: posV, pjLocal: pjL, pjVisita: pjV, ganLocal: ganL, ganVisita: ganV, ptsLocal: ptsL, ptsVisita: ptsV, gfLocal: gfL, gfVisita: gfV })
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+
+    const html = `
+      <div class="prediccion-resultado">
+        <div class="pred-titulo">${data.emoji} ${data.resultado}</div>
+        <div class="barras-wrap">
+          <div class="barra-row">
+            <span class="barra-label">${local}</span>
+            <div class="barra-bg"><div class="barra-fill barra-local-fill" style="width:${data.pct_local}%"></div></div>
+            <span class="barra-pct">${data.pct_local}%</span>
+          </div>
+          <div class="barra-row">
+            <span class="barra-label">Empate</span>
+            <div class="barra-bg"><div class="barra-fill barra-empate-fill" style="width:${data.pct_empate}%"></div></div>
+            <span class="barra-pct">${data.pct_empate}%</span>
+          </div>
+          <div class="barra-row">
+            <span class="barra-label">${visita}</span>
+            <div class="barra-bg"><div class="barra-fill barra-visita-fill" style="width:${data.pct_visita}%"></div></div>
+            <span class="barra-pct">${data.pct_visita}%</span>
+          </div>
+        </div>
+        <div class="pred-marcador">⚽ Marcador probable: ${data.marcador}</div>
+        <div class="pred-info">📊 ${data.razon}</div>
+      </div>`;
+    prediccionesCache[pid] = html;
+    resEl.innerHTML = html;
+    btn.textContent = "✅ Ver prediccion";
+  } catch(e) {
+    resEl.innerHTML = `<div style="color:#e53935;font-size:0.85em;padding:8px;">Error al calcular. Intenta de nuevo.</div>`;
+    btn.disabled = false;
+    btn.textContent = "📊 Predecir";
+  }
+}
+
 function cambiarLiga(liga, btn) {
   ligaActual = liga;
   marcadoresAnteriores = {};
+  prediccionesCache = {};
+  statsTabla = {};
   document.querySelectorAll(".liga-btn").forEach(b => b.classList.remove("activo"));
   btn.classList.add("activo");
   cargarSeccion(tabActual);
@@ -257,21 +248,22 @@ async function cargarPartidos() {
   const el = document.getElementById("partidos-contenido");
   el.innerHTML = `<div class="cargando">Cargando partidos...</div>`;
   try {
-    const [resPartidos, resTabla] = await Promise.all([
+    const [resP, resT] = await Promise.all([
       fetch(`/api/partidos/${ligaActual}`),
       fetch(`/api/tabla/${ligaActual}`)
     ]);
-    const dataP = await resPartidos.json();
-    const dataT = await resTabla.json();
+    const dataP = await resP.json();
+    const dataT = await resT.json();
 
     const posiciones = {};
     const stats = {};
     if (dataT.standings && dataT.standings[0]) {
       dataT.standings[0].table.forEach(e => {
         posiciones[e.team.id] = e.position;
-        stats[e.team.id] = { pj: e.playedGames, gan: e.won };
+        stats[e.team.id] = { pj: e.playedGames, gan: e.won, pts: e.points, gf: e.goalsFor || 0 };
       });
     }
+    statsTabla = stats;
 
     if (!dataP.matches || dataP.matches.length === 0) {
       el.innerHTML = `<div class="error-msg">No hay partidos esta semana.</div>`;
@@ -306,16 +298,16 @@ async function cargarPartidos() {
         badge = `<span class="badge badge-fin">Final</span>`;
       }
 
-      const posL = posiciones[p.homeTeam.id] || "?";
-      const posV = posiciones[p.awayTeam.id] || "?";
-      const stL = stats[p.homeTeam.id] || {pj:0, gan:0};
-      const stV = stats[p.awayTeam.id] || {pj:0, gan:0};
+      const stL = stats[p.homeTeam.id] || {pj:1, gan:0, pts:0, gf:0};
+      const stV = stats[p.awayTeam.id] || {pj:1, gan:0, pts:0, gf:0};
+      const posL = posiciones[p.homeTeam.id] || 10;
+      const posV = posiciones[p.awayTeam.id] || 10;
       const pid = p.id;
 
       const botonIA = esFuturo ? `
         <button class="btn-prediccion" id="btn-${pid}"
-          onclick="pedirPrediccion(${pid},'${local}','${visita}',${posL},${posV},${stL.pj},${stV.pj},${stL.gan},${stV.gan},'btn-${pid}','res-${pid}')">
-          🤖 Predecir con IA
+          onclick="event.stopPropagation(); pedirPrediccion(${pid},'${local}','${visita}',${posL},${posV},${stL.pj},${stV.pj},${stL.gan},${stV.gan},${stL.pts},${stV.pts},${stL.gf},${stV.gf})">
+          📊 Predecir resultado
         </button>` : "";
 
       html += `
