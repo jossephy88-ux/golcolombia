@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#003087">
+<meta name="theme-color" content="#001a5e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="GolColombia">
 <link rel="manifest" href="/static/manifest.json">
@@ -11,22 +11,31 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; background: #f0f0f0; color: #333; }
-  .header-top { background: #003087; color: white; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
-  .logo { display: flex; align-items: center; gap: 8px; }
-  .logo h1 { font-size: 1.2em; font-weight: bold; }
-  .logo span { color: #FDD835; }
-  .notif-btn { background: none; border: 1.5px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8em; cursor: pointer; }
-  .notif-btn.activo { background: #FDD835; color: #003087; border-color: #FDD835; font-weight: bold; }
-  .ligas-scroll { background: #002070; padding: 8px 16px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+
+  .header-ani { position: relative; overflow: hidden; background: #001a5e; height: 110px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+  .header-ani canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.55; }
+  .header-logo { position: relative; z-index: 2; display: flex; align-items: center; gap: 8px; color: white; }
+  .header-logo h1 { font-size: 1.4em; font-weight: bold; letter-spacing: 2px; }
+  .header-logo h1 span { color: #FDD835; }
+  .header-logo p { font-size: 0.7em; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
+  .notif-btn { position: relative; z-index: 2; background: none; border: 1.5px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8em; cursor: pointer; }
+  .notif-btn.activo { background: #FDD835; color: #001a5e; border-color: #FDD835; font-weight: bold; }
+
+  .ligas-scroll { background: #001060; padding: 8px 16px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
   .ligas-scroll::-webkit-scrollbar { display: none; }
   .liga-btn { background: none; border: 1.5px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.7); padding: 6px 14px; border-radius: 20px; font-size: 0.8em; cursor: pointer; white-space: nowrap; }
-  .liga-btn.activo { background: #FDD835; color: #003087; border-color: #FDD835; font-weight: bold; }
-  .tabs { background: #003087; display: flex; border-top: 1px solid rgba(255,255,255,0.1); }
+  .liga-btn.activo { background: #FDD835; color: #001a5e; border-color: #FDD835; font-weight: bold; }
+  .liga-btn.colombia { border-color: #FDD835; color: #FDD835; }
+  .liga-btn.colombia.activo { background: #FDD835; color: #001a5e; }
+
+  .tabs { background: #001a5e; display: flex; border-top: 1px solid rgba(255,255,255,0.1); }
   .tab { flex: 1; padding: 11px; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.85em; font-weight: bold; border: none; background: none; text-align: center; border-bottom: 3px solid transparent; }
   .tab.activo { color: #FDD835; border-bottom: 3px solid #FDD835; }
+
   .container { max-width: 800px; margin: 0 auto; padding: 16px; }
   .seccion { display: none; }
   .seccion.visible { display: block; }
+
   .partido { background: white; border-radius: 10px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); cursor: pointer; }
   .partido:hover { background: #fafafa; }
   .partido.live-partido { border-left: 4px solid #e53935; }
@@ -36,7 +45,7 @@
   .equipo img { width: 28px; height: 28px; object-fit: contain; }
   .equipo-nombre { font-size: 0.85em; font-weight: bold; }
   .marcador { text-align: center; min-width: 70px; }
-  .score { font-size: 1.3em; font-weight: bold; color: #003087; display: block; }
+  .score { font-size: 1.3em; font-weight: bold; color: #001a5e; display: block; }
   .hora { font-size: 0.7em; color: #888; display: block; }
   .live { font-size: 0.7em; color: #e53935; font-weight: bold; display: block; animation: pulso 1s infinite; }
   @keyframes pulso { 0%,100%{opacity:1} 50%{opacity:0.5} }
@@ -45,25 +54,26 @@
   .badge-fin { background: #e8f5e9; color: #2e7d32; }
   .badge-prox { background: #e3f2fd; color: #1565c0; }
   .fecha-titulo { font-size: 0.75em; font-weight: bold; color: #888; letter-spacing: 1px; text-transform: uppercase; padding: 12px 0 6px; }
+
   .prediccion-box { margin-top: 12px; border-top: 1px solid #f0f0f0; padding-top: 12px; display: none; }
   .prediccion-box.visible { display: block; }
-  .btn-prediccion { width: 100%; padding: 9px; background: #003087; color: white; border: none; border-radius: 8px; font-size: 0.85em; cursor: pointer; font-weight: bold; }
+  .btn-prediccion { width: 100%; padding: 9px; background: #001a5e; color: white; border: none; border-radius: 8px; font-size: 0.85em; cursor: pointer; font-weight: bold; }
   .btn-prediccion:disabled { opacity: 0.6; cursor: not-allowed; }
-  .prediccion-resultado { background: #f0f4ff; border-radius: 10px; padding: 14px; margin-top: 10px; border-left: 4px solid #003087; }
-  .pred-titulo { font-size: 1em; font-weight: bold; color: #003087; margin-bottom: 10px; }
-  .barras-wrap { margin: 10px 0; }
+  .prediccion-resultado { background: #f0f4ff; border-radius: 10px; padding: 14px; margin-top: 10px; border-left: 4px solid #001a5e; }
+  .pred-titulo { font-size: 1em; font-weight: bold; color: #001a5e; margin-bottom: 10px; }
   .barra-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-  .barra-label { font-size: 0.75em; color: #555; min-width: 80px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+  .barra-label { font-size: 0.75em; color: #555; min-width: 80px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
   .barra-bg { flex: 1; background: #e0e0e0; border-radius: 4px; height: 10px; }
   .barra-fill { height: 10px; border-radius: 4px; }
-  .barra-local-fill { background: #003087; }
+  .barra-local-fill { background: #001a5e; }
   .barra-empate-fill { background: #888; }
   .barra-visita-fill { background: #e53935; }
   .barra-pct { font-size: 0.8em; font-weight: bold; min-width: 35px; text-align: right; }
   .pred-info { font-size: 0.82em; color: #555; margin-top: 8px; line-height: 1.5; }
-  .pred-marcador { font-size: 1.1em; font-weight: bold; color: #003087; text-align: center; margin-top: 8px; padding: 8px; background: white; border-radius: 8px; }
+  .pred-marcador { font-size: 1.1em; font-weight: bold; color: #001a5e; text-align: center; margin-top: 8px; padding: 8px; background: white; border-radius: 8px; }
+
   .tabla-wrap { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-  .tabla-header { background: #003087; color: white; display: grid; grid-template-columns: 36px 1fr 36px 36px 36px 36px 36px 44px; padding: 10px 12px; font-size: 0.72em; font-weight: bold; text-align: center; gap: 4px; }
+  .tabla-header { background: #001a5e; color: white; display: grid; grid-template-columns: 36px 1fr 36px 36px 36px 36px 36px 44px; padding: 10px 12px; font-size: 0.72em; font-weight: bold; text-align: center; gap: 4px; }
   .tabla-header .nc { text-align: left; }
   .tabla-fila { display: grid; grid-template-columns: 36px 1fr 36px 36px 36px 36px 36px 44px; padding: 9px 12px; font-size: 0.82em; gap: 4px; border-bottom: 1px solid #f0f0f0; align-items: center; text-align: center; }
   .tabla-fila:hover { background: #f9f9f9; }
@@ -71,16 +81,18 @@
   .tabla-fila.desc { background: #ffebee; }
   .equipo-tabla { display: flex; align-items: center; gap: 6px; text-align: left; }
   .equipo-tabla img { width: 20px; height: 20px; object-fit: contain; }
-  .pts { font-weight: bold; color: #003087; }
+  .pts { font-weight: bold; color: #001a5e; }
+
   .goleador { background: white; border-radius: 10px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 14px; }
-  .gol-pos { font-size: 1.1em; font-weight: bold; color: #003087; min-width: 28px; text-align: center; }
+  .gol-pos { font-size: 1.1em; font-weight: bold; color: #001a5e; min-width: 28px; text-align: center; }
   .gol-info { flex: 1; }
   .gol-nombre { font-weight: bold; font-size: 0.9em; }
   .gol-equipo { font-size: 0.75em; color: #888; margin-top: 2px; }
-  .gol-count { font-size: 1.2em; font-weight: bold; color: #FDD835; background: #003087; padding: 5px 10px; border-radius: 8px; }
+  .gol-count { font-size: 1.2em; font-weight: bold; color: #FDD835; background: #001a5e; padding: 5px 10px; border-radius: 8px; }
+
   .live-indicator { background: #e53935; color: white; text-align: center; padding: 6px; font-size: 0.8em; font-weight: bold; display: none; }
   .live-indicator.visible { display: block; }
-  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #003087; color: white; padding: 12px 20px; border-radius: 10px; font-size: 0.9em; z-index: 9999; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-width: 90%; text-align: center; }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #001a5e; color: white; padding: 12px 20px; border-radius: 10px; font-size: 0.9em; z-index: 9999; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-width: 90%; text-align: center; }
   .toast.visible { display: block; }
   .cargando { text-align: center; padding: 40px; color: #888; }
   .error-msg { text-align: center; padding: 30px; color: #e53935; font-size: 0.9em; }
@@ -90,20 +102,27 @@
 <body>
 
 <div id="live-indicator" class="live-indicator">⚽ HAY PARTIDOS EN VIVO AHORA</div>
-<div class="header-top">
-  <div class="logo">
-    <span style="font-size:1.5em">⚽</span>
-    <h1>Gol<span>Colombia</span></h1>
+
+<div class="header-ani">
+  <canvas id="waveCanvas"></canvas>
+  <div class="header-logo">
+    <div>
+      <h1>GOL<span>COLOMBIA</span></h1>
+      <p>RESULTADOS EN TIEMPO REAL 🇨🇴</p>
+    </div>
   </div>
   <button class="notif-btn" id="notif-btn" onclick="toggleNotificaciones()">🔔 Alertas</button>
 </div>
+
 <div class="ligas-scroll">
-  <button class="liga-btn activo" onclick="cambiarLiga('premier', this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier</button>
+  <button class="liga-btn colombia activo" onclick="cambiarLiga('colombia', this)">🇨🇴 Liga BetPlay</button>
+  <button class="liga-btn" onclick="cambiarLiga('premier', this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier</button>
   <button class="liga-btn" onclick="cambiarLiga('laliga', this)">🇪🇸 La Liga</button>
   <button class="liga-btn" onclick="cambiarLiga('seriea', this)">🇮🇹 Serie A</button>
   <button class="liga-btn" onclick="cambiarLiga('bundesliga', this)">🇩🇪 Bundesliga</button>
   <button class="liga-btn" onclick="cambiarLiga('champions', this)">🇪🇺 Champions</button>
 </div>
+
 <div class="tabs">
   <button class="tab activo" onclick="cambiarTab('partidos', this)">Partidos</button>
   <button class="tab" onclick="cambiarTab('tabla', this)">Tabla</button>
@@ -123,20 +142,50 @@
 </div>
 
 <div id="toast" class="toast"></div>
-<footer>GolColombia &copy; 2026 — Resultados en tiempo real</footer>
+<footer>GolColombia &copy; 2026 — Resultados en tiempo real 🇨🇴</footer>
 
 <script>
-let ligaActual = "premier";
+// ANIMACION ONDAS
+const canvas = document.getElementById("waveCanvas");
+const ctx = canvas.getContext("2d");
+let t = 0;
+function resizeCanvas() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
+function drawWaves() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  const cols = [[253,216,53],[220,30,30],[0,80,200],[255,180,0],[0,48,135]];
+  cols.forEach(([r,g,b], i) => {
+    const amp = 15 + i * 5, freq = 0.01 + i * 0.004, speed = 0.02 + i * 0.008;
+    const yBase = H * (0.15 + i * 0.18);
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 2) {
+      const y = yBase + Math.sin(x * freq + t * speed + i) * amp;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+    ctx.fillStyle = `rgba(${r},${g},${b},0.15)`; ctx.fill();
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 2) {
+      const y = yBase + Math.sin(x * freq + t * speed + i) * amp;
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = `rgba(${r},${g},${b},0.45)`; ctx.lineWidth = 1.5; ctx.stroke();
+  });
+  t++; requestAnimationFrame(drawWaves);
+}
+drawWaves();
+
+let ligaActual = "colombia";
 let tabActual = "partidos";
 let notifActivas = false;
 let marcadoresAnteriores = {};
 let prediccionesCache = {};
-let statsTabla = {};
 
 function mostrarToast(msg, tiempo = 3000) {
   const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("visible");
+  t.textContent = msg; t.classList.add("visible");
   setTimeout(() => t.classList.remove("visible"), tiempo);
 }
 
@@ -158,68 +207,41 @@ async function toggleNotificaciones() {
 }
 
 function togglePrediccion(id) {
-  const box = document.getElementById(`pred-${id}`);
-  box.classList.toggle("visible");
+  document.getElementById(`pred-${id}`).classList.toggle("visible");
 }
 
 async function pedirPrediccion(pid, local, visita, posL, posV, pjL, pjV, ganL, ganV, ptsL, ptsV, gfL, gfV) {
-  if (prediccionesCache[pid]) {
-    document.getElementById(`res-${pid}`).innerHTML = prediccionesCache[pid];
-    return;
-  }
+  if (prediccionesCache[pid]) { document.getElementById(`res-${pid}`).innerHTML = prediccionesCache[pid]; return; }
   const btn = document.getElementById(`btn-${pid}`);
   const resEl = document.getElementById(`res-${pid}`);
-  btn.disabled = true;
-  btn.textContent = "Analizando...";
+  btn.disabled = true; btn.textContent = "Analizando...";
   resEl.innerHTML = `<div style="text-align:center;padding:10px;color:#888;font-size:0.85em;">📊 Calculando prediccion...</div>`;
-
   try {
     const res = await fetch("/api/prediccion", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ local, visita, posLocal: posL, posVisita: posV, pjLocal: pjL, pjVisita: pjV, ganLocal: ganL, ganVisita: ganV, ptsLocal: ptsL, ptsVisita: ptsV, gfLocal: gfL, gfVisita: gfV })
+      method: "POST", headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({local, visita, posLocal:posL, posVisita:posV, pjLocal:pjL, pjVisita:pjV, ganLocal:ganL, ganVisita:ganV, ptsLocal:ptsL, ptsVisita:ptsV, gfLocal:gfL, gfVisita:gfV})
     });
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);
-
-    const html = `
-      <div class="prediccion-resultado">
-        <div class="pred-titulo">${data.emoji} ${data.resultado}</div>
-        <div class="barras-wrap">
-          <div class="barra-row">
-            <span class="barra-label">${local}</span>
-            <div class="barra-bg"><div class="barra-fill barra-local-fill" style="width:${data.pct_local}%"></div></div>
-            <span class="barra-pct">${data.pct_local}%</span>
-          </div>
-          <div class="barra-row">
-            <span class="barra-label">Empate</span>
-            <div class="barra-bg"><div class="barra-fill barra-empate-fill" style="width:${data.pct_empate}%"></div></div>
-            <span class="barra-pct">${data.pct_empate}%</span>
-          </div>
-          <div class="barra-row">
-            <span class="barra-label">${visita}</span>
-            <div class="barra-bg"><div class="barra-fill barra-visita-fill" style="width:${data.pct_visita}%"></div></div>
-            <span class="barra-pct">${data.pct_visita}%</span>
-          </div>
-        </div>
-        <div class="pred-marcador">⚽ Marcador probable: ${data.marcador}</div>
-        <div class="pred-info">📊 ${data.razon}</div>
-      </div>`;
+    const html = `<div class="prediccion-resultado">
+      <div class="pred-titulo">${data.emoji} ${data.resultado}</div>
+      <div class="barra-row"><span class="barra-label">${local}</span><div class="barra-bg"><div class="barra-fill barra-local-fill" style="width:${data.pct_local}%"></div></div><span class="barra-pct">${data.pct_local}%</span></div>
+      <div class="barra-row"><span class="barra-label">Empate</span><div class="barra-bg"><div class="barra-fill barra-empate-fill" style="width:${data.pct_empate}%"></div></div><span class="barra-pct">${data.pct_empate}%</span></div>
+      <div class="barra-row"><span class="barra-label">${visita}</span><div class="barra-bg"><div class="barra-fill barra-visita-fill" style="width:${data.pct_visita}%"></div></div><span class="barra-pct">${data.pct_visita}%</span></div>
+      <div class="pred-marcador">⚽ Marcador probable: ${data.marcador}</div>
+      <div class="pred-info">📊 ${data.razon}</div>
+    </div>`;
     prediccionesCache[pid] = html;
     resEl.innerHTML = html;
     btn.textContent = "✅ Ver prediccion";
   } catch(e) {
-    resEl.innerHTML = `<div style="color:#e53935;font-size:0.85em;padding:8px;">Error al calcular. Intenta de nuevo.</div>`;
-    btn.disabled = false;
-    btn.textContent = "📊 Predecir";
+    resEl.innerHTML = `<div style="color:#e53935;font-size:0.85em;padding:8px;">Error. Intenta de nuevo.</div>`;
+    btn.disabled = false; btn.textContent = "📊 Predecir";
   }
 }
 
 function cambiarLiga(liga, btn) {
-  ligaActual = liga;
-  marcadoresAnteriores = {};
-  prediccionesCache = {};
-  statsTabla = {};
+  ligaActual = liga; marcadoresAnteriores = {}; prediccionesCache = {};
   document.querySelectorAll(".liga-btn").forEach(b => b.classList.remove("activo"));
   btn.classList.add("activo");
   cargarSeccion(tabActual);
@@ -238,7 +260,6 @@ function formatHora(fecha) {
   if (!fecha) return "";
   return new Date(fecha).toLocaleTimeString("es-CO", {hour:"2-digit", minute:"2-digit"});
 }
-
 function formatFecha(fecha) {
   if (!fecha) return "";
   return new Date(fecha).toLocaleDateString("es-CO", {weekday:"long", day:"numeric", month:"long"});
@@ -248,96 +269,58 @@ async function cargarPartidos() {
   const el = document.getElementById("partidos-contenido");
   el.innerHTML = `<div class="cargando">Cargando partidos...</div>`;
   try {
-    const [resP, resT] = await Promise.all([
-      fetch(`/api/partidos/${ligaActual}`),
-      fetch(`/api/tabla/${ligaActual}`)
-    ]);
+    const [resP, resT] = await Promise.all([fetch(`/api/partidos/${ligaActual}`), fetch(`/api/tabla/${ligaActual}`)]);
     const dataP = await resP.json();
     const dataT = await resT.json();
-
-    const posiciones = {};
-    const stats = {};
+    const posiciones = {}, stats = {};
     if (dataT.standings && dataT.standings[0]) {
       dataT.standings[0].table.forEach(e => {
-        posiciones[e.team.id] = e.position;
-        stats[e.team.id] = { pj: e.playedGames, gan: e.won, pts: e.points, gf: e.goalsFor || 0 };
+        posiciones[e.team.name] = e.position;
+        stats[e.team.name] = {pj: e.playedGames, gan: e.won, pts: e.points, gf: e.goalsFor || 0};
       });
     }
-    statsTabla = stats;
-
     if (!dataP.matches || dataP.matches.length === 0) {
-      el.innerHTML = `<div class="error-msg">No hay partidos esta semana.</div>`;
-      return;
+      el.innerHTML = `<div class="error-msg">No hay partidos disponibles esta semana.</div>`; return;
     }
-
-    let html = "";
-    let fechaActual = "";
-    let hayLive = false;
-
+    let html = "", fechaActual = "", hayLive = false;
     dataP.matches.slice(0, 30).forEach(p => {
       const fecha = formatFecha(p.utcDate);
-      if (fecha !== fechaActual) {
-        html += `<div class="fecha-titulo">${fecha}</div>`;
-        fechaActual = fecha;
-      }
+      if (fecha !== fechaActual) { html += `<div class="fecha-titulo">${fecha}</div>`; fechaActual = fecha; }
       const local = p.homeTeam.shortName || p.homeTeam.name;
       const visita = p.awayTeam.shortName || p.awayTeam.name;
       const logoL = p.homeTeam.crest || "";
       const logoV = p.awayTeam.crest || "";
-      const esLive = p.status === "IN_PLAY" || p.status === "PAUSED";
-      const esFuturo = p.status === "SCHEDULED" || p.status === "TIMED";
+      const esLive = p.status === "IN_PLAY" || p.status === "PAUSED" || p.status === "live";
+      const esFuturo = p.status === "SCHEDULED" || p.status === "TIMED" || p.status === "upcoming";
       if (esLive) hayLive = true;
-
       let score = `<span class="hora">${formatHora(p.utcDate)}</span>`;
       let badge = `<span class="badge badge-prox">Proximo</span>`;
       if (esLive) {
-        score = `<span class="score">${p.score.fullTime.home ?? 0} - ${p.score.fullTime.away ?? 0}</span><span class="live">EN VIVO</span>`;
+        score = `<span class="score">${p.score?.fullTime?.home ?? 0} - ${p.score?.fullTime?.away ?? 0}</span><span class="live">EN VIVO</span>`;
         badge = `<span class="badge badge-live">LIVE</span>`;
-      } else if (p.status === "FINISHED") {
-        score = `<span class="score">${p.score.fullTime.home} - ${p.score.fullTime.away}</span>`;
+      } else if (p.status === "FINISHED" || p.status === "finished") {
+        score = `<span class="score">${p.score?.fullTime?.home ?? 0} - ${p.score?.fullTime?.away ?? 0}</span>`;
         badge = `<span class="badge badge-fin">Final</span>`;
       }
-
-      const stL = stats[p.homeTeam.id] || {pj:1, gan:0, pts:0, gf:0};
-      const stV = stats[p.awayTeam.id] || {pj:1, gan:0, pts:0, gf:0};
-      const posL = posiciones[p.homeTeam.id] || 10;
-      const posV = posiciones[p.awayTeam.id] || 10;
+      const stL = stats[p.homeTeam.name] || {pj:1, gan:0, pts:0, gf:0};
+      const stV = stats[p.awayTeam.name] || {pj:1, gan:0, pts:0, gf:0};
+      const posL = posiciones[p.homeTeam.name] || 10;
+      const posV = posiciones[p.awayTeam.name] || 10;
       const pid = p.id;
-
-      const botonIA = esFuturo ? `
-        <button class="btn-prediccion" id="btn-${pid}"
-          onclick="event.stopPropagation(); pedirPrediccion(${pid},'${local}','${visita}',${posL},${posV},${stL.pj},${stV.pj},${stL.gan},${stV.gan},${stL.pts},${stV.pts},${stL.gf},${stV.gf})">
-          📊 Predecir resultado
-        </button>` : "";
-
-      html += `
-        <div class="partido ${esLive ? 'live-partido' : ''}" onclick="togglePrediccion(${pid})">
-          <div class="partido-top">
-            <div class="equipo">
-              <img src="${logoL}" onerror="this.style.display='none'" alt="">
-              <span class="equipo-nombre">${local}</span>
-            </div>
-            <div class="marcador">${score}${badge}</div>
-            <div class="equipo derecha">
-              <img src="${logoV}" onerror="this.style.display='none'" alt="">
-              <span class="equipo-nombre">${visita}</span>
-            </div>
-          </div>
-          <div class="prediccion-box" id="pred-${pid}">
-            ${botonIA}
-            <div id="res-${pid}"></div>
-          </div>
-        </div>`;
+      const botonIA = esFuturo ? `<button class="btn-prediccion" id="btn-${pid}" onclick="event.stopPropagation();pedirPrediccion(${pid},'${local.replace(/'/g,"\\'")}','${visita.replace(/'/g,"\\'")}',${posL},${posV},${stL.pj},${stV.pj},${stL.gan},${stV.gan},${stL.pts},${stV.pts},${stL.gf},${stV.gf})">📊 Predecir resultado</button>` : "";
+      html += `<div class="partido ${esLive ? 'live-partido' : ''}" onclick="togglePrediccion(${pid})">
+        <div class="partido-top">
+          <div class="equipo"><img src="${logoL}" onerror="this.style.display='none'" alt=""><span class="equipo-nombre">${local}</span></div>
+          <div class="marcador">${score}${badge}</div>
+          <div class="equipo derecha"><img src="${logoV}" onerror="this.style.display='none'" alt=""><span class="equipo-nombre">${visita}</span></div>
+        </div>
+        <div class="prediccion-box" id="pred-${pid}">${botonIA}<div id="res-${pid}"></div></div>
+      </div>`;
     });
-
     el.innerHTML = html;
     const ind = document.getElementById("live-indicator");
-    if (hayLive) ind.classList.add("visible");
-    else ind.classList.remove("visible");
-
-  } catch(e) {
-    el.innerHTML = `<div class="error-msg">Error de conexion.</div>`;
-  }
+    if (hayLive) ind.classList.add("visible"); else ind.classList.remove("visible");
+  } catch(e) { el.innerHTML = `<div class="error-msg">Error de conexion.</div>`; }
 }
 
 async function cargarTabla() {
@@ -351,7 +334,7 @@ async function cargarTabla() {
     let html = `<div class="tabla-wrap"><div class="tabla-header"><div>#</div><div class="nc">Equipo</div><div>PJ</div><div>G</div><div>E</div><div>P</div><div>GD</div><div>PTS</div></div>`;
     tabla.forEach((e, i) => {
       let clase = i < 4 ? "top" : i >= tabla.length - 3 ? "desc" : "";
-      html += `<div class="tabla-fila ${clase}"><div>${e.position}</div><div class="equipo-tabla"><img src="${e.team.crest}" onerror="this.style.display='none'" alt=""><span>${e.team.shortName || e.team.name}</span></div><div>${e.playedGames}</div><div>${e.won}</div><div>${e.draw}</div><div>${e.lost}</div><div>${e.goalDifference > 0 ? '+' : ''}${e.goalDifference}</div><div class="pts">${e.points}</div></div>`;
+      html += `<div class="tabla-fila ${clase}"><div>${e.position}</div><div class="equipo-tabla"><img src="${e.team.crest || ''}" onerror="this.style.display='none'" alt=""><span>${e.team.shortName || e.team.name}</span></div><div>${e.playedGames}</div><div>${e.won}</div><div>${e.draw}</div><div>${e.lost}</div><div>${e.goalDifference > 0 ? '+' : ''}${e.goalDifference}</div><div class="pts">${e.points}</div></div>`;
     });
     html += `</div><p style="font-size:0.72em;color:#aaa;padding:8px 4px;">🟢 Clasificacion | 🔴 Descenso</p>`;
     el.innerHTML = html;
