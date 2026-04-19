@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#003087">
-<meta name="description" content="GolColombia - Resultados de futbol en tiempo real">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GolColombia">
 <link rel="manifest" href="/static/manifest.json">
 <title>GolColombia — Resultados en Vivo</title>
@@ -18,7 +16,7 @@
   .logo { display: flex; align-items: center; gap: 8px; }
   .logo h1 { font-size: 1.2em; font-weight: bold; }
   .logo span { color: #FDD835; }
-  .notif-btn { background: none; border: 1.5px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8em; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .notif-btn { background: none; border: 1.5px solid rgba(255,255,255,0.4); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8em; cursor: pointer; }
   .notif-btn.activo { background: #FDD835; color: #003087; border-color: #FDD835; font-weight: bold; }
 
   .ligas-scroll { background: #002070; padding: 8px 16px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
@@ -27,16 +25,17 @@
   .liga-btn.activo { background: #FDD835; color: #003087; border-color: #FDD835; font-weight: bold; }
 
   .tabs { background: #003087; display: flex; border-top: 1px solid rgba(255,255,255,0.1); }
-  .tab { flex: 1; padding: 11px; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.85em; font-weight: bold; border-bottom: 3px solid transparent; border: none; background: none; text-align: center; }
+  .tab { flex: 1; padding: 11px; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 0.85em; font-weight: bold; border: none; background: none; text-align: center; border-bottom: 3px solid transparent; }
   .tab.activo { color: #FDD835; border-bottom: 3px solid #FDD835; }
 
   .container { max-width: 800px; margin: 0 auto; padding: 16px; }
   .seccion { display: none; }
   .seccion.visible { display: block; }
 
-  .partido { background: white; border-radius: 10px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: transform 0.1s; }
+  .partido { background: white; border-radius: 10px; padding: 14px; margin-bottom: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); cursor: pointer; transition: transform 0.1s; }
   .partido:hover { transform: scale(1.01); }
   .partido.live-partido { border-left: 4px solid #e53935; }
+  .partido-top { display: flex; align-items: center; justify-content: space-between; }
   .equipo { display: flex; align-items: center; gap: 8px; flex: 1; }
   .equipo.derecha { flex-direction: row-reverse; }
   .equipo img { width: 28px; height: 28px; object-fit: contain; }
@@ -51,6 +50,24 @@
   .badge-fin { background: #e8f5e9; color: #2e7d32; }
   .badge-prox { background: #e3f2fd; color: #1565c0; }
   .fecha-titulo { font-size: 0.75em; font-weight: bold; color: #888; letter-spacing: 1px; text-transform: uppercase; padding: 12px 0 6px; }
+
+  /* PREDICCION IA */
+  .prediccion-box { margin-top: 12px; border-top: 1px solid #f0f0f0; padding-top: 12px; display: none; }
+  .prediccion-box.visible { display: block; }
+  .btn-prediccion { width: 100%; padding: 8px; background: linear-gradient(135deg, #003087, #0056b3); color: white; border: none; border-radius: 8px; font-size: 0.85em; cursor: pointer; font-weight: bold; margin-top: 10px; }
+  .btn-prediccion:disabled { opacity: 0.6; cursor: not-allowed; }
+  .prediccion-resultado { background: linear-gradient(135deg, #f8f9ff, #e8f0ff); border-radius: 10px; padding: 14px; margin-top: 10px; border-left: 4px solid #003087; }
+  .prediccion-resultado h4 { color: #003087; font-size: 0.9em; margin-bottom: 8px; }
+  .prediccion-resultado p { font-size: 0.85em; color: #444; line-height: 1.6; }
+  .prediccion-cargando { text-align: center; padding: 15px; color: #888; font-size: 0.85em; }
+  .barras { display: flex; gap: 8px; margin: 10px 0; align-items: center; }
+  .barra-wrap { flex: 1; }
+  .barra-label { font-size: 0.75em; color: #666; margin-bottom: 3px; }
+  .barra { height: 8px; border-radius: 4px; }
+  .barra-local { background: #003087; }
+  .barra-empate { background: #888; }
+  .barra-visita { background: #e53935; }
+  .barra-pct { font-size: 0.8em; font-weight: bold; text-align: center; }
 
   .tabla-wrap { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
   .tabla-header { background: #003087; color: white; display: grid; grid-template-columns: 36px 1fr 36px 36px 36px 36px 36px 44px; padding: 10px 12px; font-size: 0.72em; font-weight: bold; text-align: center; gap: 4px; }
@@ -74,12 +91,12 @@
   .live-indicator.visible { display: block; }
 
   .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #003087; color: white; padding: 12px 20px; border-radius: 10px; font-size: 0.9em; z-index: 9999; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-width: 90%; text-align: center; }
-  .toast.visible { display: block; animation: slideUp 0.3s ease; }
-  @keyframes slideUp { from{transform:translateX(-50%) translateY(20px);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
+  .toast.visible { display: block; }
 
   .cargando { text-align: center; padding: 40px; color: #888; }
   .error-msg { text-align: center; padding: 30px; color: #e53935; font-size: 0.9em; }
   footer { text-align: center; padding: 20px; color: #aaa; font-size: 0.75em; }
+  .ia-badge { display: inline-block; background: linear-gradient(135deg, #003087, #0056b3); color: white; font-size: 0.7em; padding: 2px 8px; border-radius: 10px; margin-left: 6px; }
 </style>
 </head>
 <body>
@@ -91,9 +108,7 @@
     <span style="font-size:1.5em">⚽</span>
     <h1>Gol<span>Colombia</span></h1>
   </div>
-  <button class="notif-btn" id="notif-btn" onclick="toggleNotificaciones()">
-    🔔 Activar alertas
-  </button>
+  <button class="notif-btn" id="notif-btn" onclick="toggleNotificaciones()">🔔 Alertas</button>
 </div>
 
 <div class="ligas-scroll">
@@ -123,7 +138,6 @@
 </div>
 
 <div id="toast" class="toast"></div>
-
 <footer>GolColombia &copy; 2026 — Resultados en tiempo real</footer>
 
 <script>
@@ -131,7 +145,7 @@ let ligaActual = "premier";
 let tabActual = "partidos";
 let notifActivas = false;
 let marcadoresAnteriores = {};
-let intervaloActualizar = null;
+let prediccionesCache = {};
 
 function mostrarToast(msg, tiempo = 3000) {
   const t = document.getElementById("toast");
@@ -142,75 +156,74 @@ function mostrarToast(msg, tiempo = 3000) {
 
 async function toggleNotificaciones() {
   if (!notifActivas) {
-    if (!("Notification" in window)) {
-      mostrarToast("Tu navegador no soporta notificaciones");
-      return;
-    }
     const permiso = await Notification.requestPermission();
     if (permiso === "granted") {
       notifActivas = true;
       document.getElementById("notif-btn").className = "notif-btn activo";
-      document.getElementById("notif-btn").textContent = "🔔 Alertas activas";
+      document.getElementById("notif-btn").textContent = "🔔 Activo";
       mostrarToast("✅ Alertas de goles activadas!");
-      iniciarMonitoreo();
-    } else {
-      mostrarToast("❌ Permiso de notificaciones denegado");
     }
   } else {
     notifActivas = false;
     document.getElementById("notif-btn").className = "notif-btn";
-    document.getElementById("notif-btn").textContent = "🔔 Activar alertas";
-    if (intervaloActualizar) clearInterval(intervaloActualizar);
+    document.getElementById("notif-btn").textContent = "🔔 Alertas";
     mostrarToast("Alertas desactivadas");
   }
 }
 
-function iniciarMonitoreo() {
-  verificarGoles();
-  intervaloActualizar = setInterval(verificarGoles, 60000);
-}
-
-async function verificarGoles() {
-  try {
-    const res = await fetch(`/api/partidos/${ligaActual}`);
-    const data = await res.json();
-    if (!data.matches) return;
-
-    let hayLive = false;
-    data.matches.forEach(p => {
-      if (p.status === "IN_PLAY" || p.status === "PAUSED") {
-        hayLive = true;
-        const id = p.id;
-        const golesLocal = p.score.fullTime.home ?? 0;
-        const golesVisita = p.score.fullTime.away ?? 0;
-        const key = `${id}`;
-
-        if (marcadoresAnteriores[key] !== undefined) {
-          const ant = marcadoresAnteriores[key];
-          if (golesLocal > ant.local) {
-            enviarNotificacion(`⚽ GOL de ${p.homeTeam.shortName || p.homeTeam.name}!`, `${p.homeTeam.shortName} ${golesLocal} - ${golesVisita} ${p.awayTeam.shortName}`);
-          }
-          if (golesVisita > ant.visita) {
-            enviarNotificacion(`⚽ GOL de ${p.awayTeam.shortName || p.awayTeam.name}!`, `${p.homeTeam.shortName} ${golesLocal} - ${golesVisita} ${p.awayTeam.shortName}`);
-          }
-        }
-        marcadoresAnteriores[key] = { local: golesLocal, visita: golesVisita };
-      }
-    });
-
-    const ind = document.getElementById("live-indicator");
-    if (hayLive) ind.classList.add("visible");
-    else ind.classList.remove("visible");
-
-    if (tabActual === "partidos") cargarPartidos();
-  } catch(e) {}
-}
-
-function enviarNotificacion(titulo, cuerpo) {
-  if (notifActivas && Notification.permission === "granted") {
-    new Notification(titulo, { body: cuerpo, icon: "/static/icon.png" });
+async function pedirPrediccion(partidoId, local, visita, posLocal, posVisita, pjLocal, pjVisita, ganLocal, ganVisita, btnId, resultId) {
+  if (prediccionesCache[partidoId]) {
+    document.getElementById(resultId).innerHTML = prediccionesCache[partidoId];
+    return;
   }
-  mostrarToast(`${titulo} — ${cuerpo}`, 5000);
+  const btn = document.getElementById(btnId);
+  const resEl = document.getElementById(resultId);
+  btn.disabled = true;
+  btn.textContent = "Analizando...";
+  resEl.innerHTML = `<div class="prediccion-cargando">🤖 La IA esta analizando el partido...</div>`;
+
+  try {
+    const prompt = `Eres un analista experto de futbol. Analiza este partido y da una prediccion breve:
+
+Partido: ${local} vs ${visita}
+${local}: Posicion ${posLocal} en la tabla, ${ganLocal} victorias en ${pjLocal} partidos
+${visita}: Posicion ${posVisita} en la tabla, ${ganVisita} victorias en ${pjVisita} partidos
+
+Responde en este formato exacto (maximo 4 lineas):
+🏆 PREDICCION: [quien gana o empate] ([porcentaje]%)
+📊 ${local}: [porcentaje]% | Empate: [porcentaje]% | ${visita}: [porcentaje]%
+⚡ RAZON: [explicacion breve de 1 linea]
+⚽ MARCADOR PROBABLE: [X-X]`;
+
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 200,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const texto = data.content[0].text;
+    const lineas = texto.split("\n").filter(l => l.trim());
+    let html = `<div class="prediccion-resultado">
+      <h4>🤖 Prediccion IA<span class="ia-badge">Beta</span></h4>`;
+    lineas.forEach(l => { html += `<p>${l}</p>`; });
+    html += `</div>`;
+    prediccionesCache[partidoId] = html;
+    resEl.innerHTML = html;
+    btn.textContent = "✅ Prediccion lista";
+  } catch(e) {
+    resEl.innerHTML = `<div class="prediccion-resultado"><p>Error al obtener prediccion. Intenta de nuevo.</p></div>`;
+    btn.disabled = false;
+    btn.textContent = "🤖 Predecir con IA";
+  }
+}
+
+function togglePrediccion(id) {
+  const box = document.getElementById(`pred-${id}`);
+  box.classList.toggle("visible");
 }
 
 function cambiarLiga(liga, btn) {
@@ -244,15 +257,32 @@ async function cargarPartidos() {
   const el = document.getElementById("partidos-contenido");
   el.innerHTML = `<div class="cargando">Cargando partidos...</div>`;
   try {
-    const res = await fetch(`/api/partidos/${ligaActual}`);
-    const data = await res.json();
-    if (!data.matches || data.matches.length === 0) {
-      el.innerHTML = `<div class="error-msg">No hay partidos esta semana para esta liga.</div>`;
+    const [resPartidos, resTabla] = await Promise.all([
+      fetch(`/api/partidos/${ligaActual}`),
+      fetch(`/api/tabla/${ligaActual}`)
+    ]);
+    const dataP = await resPartidos.json();
+    const dataT = await resTabla.json();
+
+    const posiciones = {};
+    const stats = {};
+    if (dataT.standings && dataT.standings[0]) {
+      dataT.standings[0].table.forEach(e => {
+        posiciones[e.team.id] = e.position;
+        stats[e.team.id] = { pj: e.playedGames, gan: e.won };
+      });
+    }
+
+    if (!dataP.matches || dataP.matches.length === 0) {
+      el.innerHTML = `<div class="error-msg">No hay partidos esta semana.</div>`;
       return;
     }
+
     let html = "";
     let fechaActual = "";
-    data.matches.slice(0, 30).forEach(p => {
+    let hayLive = false;
+
+    dataP.matches.slice(0, 30).forEach(p => {
       const fecha = formatFecha(p.utcDate);
       if (fecha !== fechaActual) {
         html += `<div class="fecha-titulo">${fecha}</div>`;
@@ -263,6 +293,9 @@ async function cargarPartidos() {
       const logoL = p.homeTeam.crest || "";
       const logoV = p.awayTeam.crest || "";
       const esLive = p.status === "IN_PLAY" || p.status === "PAUSED";
+      const esFuturo = p.status === "SCHEDULED" || p.status === "TIMED";
+      if (esLive) hayLive = true;
+
       let score = `<span class="hora">${formatHora(p.utcDate)}</span>`;
       let badge = `<span class="badge badge-prox">Proximo</span>`;
       if (esLive) {
@@ -272,20 +305,44 @@ async function cargarPartidos() {
         score = `<span class="score">${p.score.fullTime.home} - ${p.score.fullTime.away}</span>`;
         badge = `<span class="badge badge-fin">Final</span>`;
       }
+
+      const posL = posiciones[p.homeTeam.id] || "?";
+      const posV = posiciones[p.awayTeam.id] || "?";
+      const stL = stats[p.homeTeam.id] || {pj:0, gan:0};
+      const stV = stats[p.awayTeam.id] || {pj:0, gan:0};
+      const pid = p.id;
+
+      const botonIA = esFuturo ? `
+        <button class="btn-prediccion" id="btn-${pid}"
+          onclick="pedirPrediccion(${pid},'${local}','${visita}',${posL},${posV},${stL.pj},${stV.pj},${stL.gan},${stV.gan},'btn-${pid}','res-${pid}')">
+          🤖 Predecir con IA
+        </button>` : "";
+
       html += `
-        <div class="partido ${esLive ? 'live-partido' : ''}">
-          <div class="equipo">
-            <img src="${logoL}" onerror="this.style.display='none'" alt="">
-            <span class="equipo-nombre">${local}</span>
+        <div class="partido ${esLive ? 'live-partido' : ''}" onclick="togglePrediccion(${pid})">
+          <div class="partido-top">
+            <div class="equipo">
+              <img src="${logoL}" onerror="this.style.display='none'" alt="">
+              <span class="equipo-nombre">${local}</span>
+            </div>
+            <div class="marcador">${score}${badge}</div>
+            <div class="equipo derecha">
+              <img src="${logoV}" onerror="this.style.display='none'" alt="">
+              <span class="equipo-nombre">${visita}</span>
+            </div>
           </div>
-          <div class="marcador">${score}${badge}</div>
-          <div class="equipo derecha">
-            <img src="${logoV}" onerror="this.style.display='none'" alt="">
-            <span class="equipo-nombre">${visita}</span>
+          <div class="prediccion-box" id="pred-${pid}">
+            ${botonIA}
+            <div id="res-${pid}"></div>
           </div>
         </div>`;
     });
+
     el.innerHTML = html;
+    const ind = document.getElementById("live-indicator");
+    if (hayLive) ind.classList.add("visible");
+    else ind.classList.remove("visible");
+
   } catch(e) {
     el.innerHTML = `<div class="error-msg">Error de conexion.</div>`;
   }
@@ -297,36 +354,16 @@ async function cargarTabla() {
   try {
     const res = await fetch(`/api/tabla/${ligaActual}`);
     const data = await res.json();
-    if (!data.standings) {
-      el.innerHTML = `<div class="error-msg">No hay tabla disponible.</div>`;
-      return;
-    }
+    if (!data.standings) { el.innerHTML = `<div class="error-msg">No hay tabla disponible.</div>`; return; }
     const tabla = data.standings[0].table;
-    let html = `<div class="tabla-wrap">
-      <div class="tabla-header">
-        <div>#</div><div class="nc">Equipo</div>
-        <div>PJ</div><div>G</div><div>E</div><div>P</div><div>GD</div><div>PTS</div>
-      </div>`;
+    let html = `<div class="tabla-wrap"><div class="tabla-header"><div>#</div><div class="nc">Equipo</div><div>PJ</div><div>G</div><div>E</div><div>P</div><div>GD</div><div>PTS</div></div>`;
     tabla.forEach((e, i) => {
       let clase = i < 4 ? "top" : i >= tabla.length - 3 ? "desc" : "";
-      html += `
-        <div class="tabla-fila ${clase}">
-          <div>${e.position}</div>
-          <div class="equipo-tabla">
-            <img src="${e.team.crest}" onerror="this.style.display='none'" alt="">
-            <span>${e.team.shortName || e.team.name}</span>
-          </div>
-          <div>${e.playedGames}</div><div>${e.won}</div>
-          <div>${e.draw}</div><div>${e.lost}</div>
-          <div>${e.goalDifference > 0 ? '+' : ''}${e.goalDifference}</div>
-          <div class="pts">${e.points}</div>
-        </div>`;
+      html += `<div class="tabla-fila ${clase}"><div>${e.position}</div><div class="equipo-tabla"><img src="${e.team.crest}" onerror="this.style.display='none'" alt=""><span>${e.team.shortName || e.team.name}</span></div><div>${e.playedGames}</div><div>${e.won}</div><div>${e.draw}</div><div>${e.lost}</div><div>${e.goalDifference > 0 ? '+' : ''}${e.goalDifference}</div><div class="pts">${e.points}</div></div>`;
     });
     html += `</div><p style="font-size:0.72em;color:#aaa;padding:8px 4px;">🟢 Clasificacion | 🔴 Descenso</p>`;
     el.innerHTML = html;
-  } catch(e) {
-    el.innerHTML = `<div class="error-msg">Error de conexion.</div>`;
-  }
+  } catch(e) { el.innerHTML = `<div class="error-msg">Error de conexion.</div>`; }
 }
 
 async function cargarGoleadores() {
@@ -335,26 +372,13 @@ async function cargarGoleadores() {
   try {
     const res = await fetch(`/api/goleadores/${ligaActual}`);
     const data = await res.json();
-    if (!data.scorers) {
-      el.innerHTML = `<div class="error-msg">No hay goleadores disponibles.</div>`;
-      return;
-    }
+    if (!data.scorers) { el.innerHTML = `<div class="error-msg">No hay goleadores disponibles.</div>`; return; }
     let html = "";
     data.scorers.slice(0, 15).forEach((g, i) => {
-      html += `
-        <div class="goleador">
-          <div class="gol-pos">${i + 1}</div>
-          <div class="gol-info">
-            <div class="gol-nombre">${g.player.name}</div>
-            <div class="gol-equipo">${g.team.name}</div>
-          </div>
-          <div class="gol-count">${g.goals} ⚽</div>
-        </div>`;
+      html += `<div class="goleador"><div class="gol-pos">${i+1}</div><div class="gol-info"><div class="gol-nombre">${g.player.name}</div><div class="gol-equipo">${g.team.name}</div></div><div class="gol-count">${g.goals} ⚽</div></div>`;
     });
     el.innerHTML = html;
-  } catch(e) {
-    el.innerHTML = `<div class="error-msg">Error de conexion.</div>`;
-  }
+  } catch(e) { el.innerHTML = `<div class="error-msg">Error de conexion.</div>`; }
 }
 
 function cargarSeccion(nombre) {
@@ -363,10 +387,7 @@ function cargarSeccion(nombre) {
   else if (nombre === "goleadores") cargarGoleadores();
 }
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/static/sw.js");
-}
-
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/static/sw.js");
 cargarPartidos();
 setInterval(() => { if (tabActual === "partidos") cargarPartidos(); }, 60000);
 </script>
