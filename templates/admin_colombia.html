@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Liga BetPlay</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f5f5f5; color: #333; }
+  header { background: linear-gradient(135deg, #FDD835, #F9A825); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #001a5e; }
+  header h1 { color: #001a5e; font-size: 1.2em; }
+  .logout { color: #001a5e; text-decoration: none; background: rgba(0,26,94,0.1); padding: 6px 14px; border-radius: 8px; font-size: 0.85em; font-weight: bold; }
+  .container { max-width: 900px; margin: 25px auto; padding: 0 16px; }
+  .card { background: white; border-radius: 12px; padding: 22px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+  .card h2 { color: #001a5e; margin-bottom: 16px; font-size: 1em; border-bottom: 2px solid #FDD835; padding-bottom: 8px; }
+  .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 12px; }
+  label { display: block; font-size: 0.8em; font-weight: bold; color: #555; margin-bottom: 3px; }
+  input, select { width: 100%; padding: 8px; border: 1.5px solid #ddd; border-radius: 6px; font-size: 0.9em; }
+  input:focus, select:focus { border-color: #FDD835; outline: none; }
+  .btn { padding: 10px 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9em; }
+  .btn-gold { background: #FDD835; color: #001a5e; }
+  .btn-blue { background: #001a5e; color: white; }
+  .btn-sm { padding: 5px 10px; font-size: 0.8em; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+  .btn-edit { background: #e3f2fd; color: #1565c0; }
+  .btn-live { background: #ffebee; color: #c62828; }
+  .btn-fin { background: #e8f5e9; color: #2e7d32; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+  th { background: #001a5e; color: white; padding: 8px 10px; text-align: left; }
+  td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  tr:hover { background: #fafafa; }
+  .badge { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 0.75em; font-weight: bold; }
+  .badge-prog { background: #e3f2fd; color: #1565c0; }
+  .badge-live { background: #ffebee; color: #c62828; }
+  .badge-fin { background: #e8f5e9; color: #2e7d32; }
+  .login-box { max-width: 340px; margin: 60px auto; background: white; padding: 35px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center; }
+  .login-box h2 { color: #001a5e; margin-bottom: 20px; }
+  .login-box input { margin-bottom: 12px; }
+  .error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 0.9em; }
+  .alerta { padding: 10px; border-radius: 8px; margin-top: 10px; font-size: 0.85em; font-weight: bold; display: none; }
+  .alerta.ok { background: #e8f5e9; color: #2e7d32; }
+  .alerta.error { background: #ffebee; color: #c62828; }
+</style>
+</head>
+<body>
+
+{% if not logueado %}
+<div class="login-box">
+  <h2>⚽ Admin Liga BetPlay</h2>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <form method="POST">
+    <label>Usuario</label>
+    <input type="text" name="usuario" required autofocus>
+    <label>Contrasena</label>
+    <input type="password" name="password" required>
+    <button type="submit" class="btn btn-blue" style="width:100%;margin-top:8px;">Ingresar</button>
+  </form>
+</div>
+
+{% else %}
+<header>
+  <h1>⚽ Admin Liga BetPlay Colombia</h1>
+  <a href="/admin/colombia/logout" class="logout">Cerrar sesion</a>
+</header>
+
+<div class="container">
+
+  <!-- AGREGAR PARTIDO -->
+  <div class="card">
+    <h2>+ Agregar Partido</h2>
+    <div class="form-row">
+      <div><label>Fecha</label><input type="date" id="fecha" value="{{ '' }}"></div>
+      <div><label>Hora</label><input type="time" id="hora" value="15:30"></div>
+      <div><label>Jornada</label><input type="number" id="jornada" value="18" min="1"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Equipo Local</label><input type="text" id="local" placeholder="Ej: Atletico Nacional"></div>
+      <div><label>Equipo Visita</label><input type="text" id="visita" placeholder="Ej: America de Cali"></div>
+      <div><label>Estado</label>
+        <select id="estado">
+          <option value="programado">Programado</option>
+          <option value="en vivo">En Vivo</option>
+          <option value="finalizado">Finalizado</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" id="goles-row" style="display:none;">
+      <div><label>Goles Local</label><input type="number" id="goles_local" value="0" min="0"></div>
+      <div><label>Goles Visita</label><input type="number" id="goles_visita" value="0" min="0"></div>
+    </div>
+    <button class="btn btn-gold" onclick="agregarPartido()">Guardar Partido</button>
+    <div id="alerta-partido" class="alerta"></div>
+  </div>
+
+  <!-- PARTIDOS -->
+  <div class="card">
+    <h2>Partidos</h2>
+    <table>
+      <thead><tr><th>Fecha</th><th>Partido</th><th>Resultado</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>
+        {% for p in partidos %}
+        <tr id="fila-{{ p.id }}">
+          <td>{{ p.fecha }}<br><small>{{ p.hora }}</small></td>
+          <td><strong>{{ p.local }}</strong> vs {{ p.visita }}</td>
+          <td id="res-{{ p.id }}">
+            {% if p.goles_local is not none %}{{ p.goles_local }} - {{ p.goles_visita }}{% else %}—{% endif %}
+          </td>
+          <td>
+            <span class="badge {% if p.estado == 'finalizado' %}badge-fin{% elif p.estado == 'en vivo' %}badge-live{% else %}badge-prog{% endif %}">
+              {{ p.estado }}
+            </span>
+          </td>
+          <td>
+            <button class="btn-sm btn-live" onclick="marcarLive({{ p.id }})">En Vivo</button>
+            <button class="btn-sm btn-edit" onclick="abrirEditar({{ p.id }}, {{ p.goles_local or 0 }}, {{ p.goles_visita or 0 }})">Editar</button>
+            <button class="btn-sm btn-fin" onclick="marcarFinal({{ p.id }})">Final</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- TABLA -->
+  <div class="card">
+    <h2>Tabla de Posiciones</h2>
+    <table>
+      <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>PTS</th><th>Editar</th></tr></thead>
+      <tbody>
+        {% for e in tabla %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td><strong>{{ e.equipo }}</strong></td>
+          <td><input type="number" value="{{ e.pj }}" id="pj-{{ e.id }}" style="width:45px;padding:4px;font-size:0.8em;" min="0"></td>
+          <td><input type="number" value="{{ e.gan }}" id="gan-{{ e.id }}" style="width:45px;padding:4px;font-size:0.8em;" min="0"></td>
+          <td><input type="number" value="{{ e.emp }}" id="emp-{{ e.id }}" style="width:45px;padding:4px;font-size:0.8em;" min="0"></td>
+          <td><input type="number" value="{{ e.per }}" id="per-{{ e.id }}" style="width:45px;padding:4px;font-size:0.8em;" min="0"></td>
+          <td><input type="number" value="{{ e.gf }}" id="gf-{{ e.id }}" style="width:45px;padding:4px;font-size:0.8em;" min="0"></td>
+          <td><input type="number" value="{{ e.gc }}" id="gc-{{ e.id }}" style="width:45px;padding:4px;font-size:0.8em;" min="0"></td>
+          <td><input type="number" value="{{ e.pts }}" id="pts-{{ e.id }}" style="width:45px;padding:4px;font-size:0.8em;" min="0"></td>
+          <td><button class="btn-sm btn-edit" onclick="actualizarTabla({{ e.id }})">Guardar</button></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- MODAL EDITAR RESULTADO -->
+<div id="modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:white;padding:25px;border-radius:12px;width:300px;">
+    <h3 style="margin-bottom:15px;color:#001a5e;">Editar Resultado</h3>
+    <input type="hidden" id="edit-id">
+    <label>Goles Local</label>
+    <input type="number" id="edit-local" value="0" min="0" style="margin-bottom:10px;">
+    <label>Goles Visita</label>
+    <input type="number" id="edit-visita" value="0" min="0" style="margin-bottom:15px;">
+    <label>Estado</label>
+    <select id="edit-estado" style="margin-bottom:15px;">
+      <option value="programado">Programado</option>
+      <option value="en vivo">En Vivo</option>
+      <option value="finalizado">Finalizado</option>
+    </select>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-gold" onclick="guardarEdicion()" style="flex:1;">Guardar</button>
+      <button class="btn" onclick="cerrarModal()" style="flex:1;background:#f5f5f5;">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+{% endif %}
+
+<script>
+document.getElementById("estado") && document.getElementById("estado").addEventListener("change", function() {
+  const golesRow = document.getElementById("goles-row");
+  if (this.value === "finalizado" || this.value === "en vivo") {
+    golesRow.style.display = "grid";
+  } else {
+    golesRow.style.display = "none";
+  }
+});
+
+async function agregarPartido() {
+  const estado = document.getElementById("estado").value;
+  const body = {
+    fecha: document.getElementById("fecha").value,
+    hora: document.getElementById("hora").value,
+    local: document.getElementById("local").value,
+    visita: document.getElementById("visita").value,
+    estado: estado,
+    jornada: parseInt(document.getElementById("jornada").value),
+    goles_local: estado !== "programado" ? parseInt(document.getElementById("goles_local").value) : null,
+    goles_visita: estado !== "programado" ? parseInt(document.getElementById("goles_visita").value) : null,
+  };
+  const res = await fetch("/admin/colombia/partido", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)});
+  const data = await res.json();
+  const alerta = document.getElementById("alerta-partido");
+  alerta.style.display = "block";
+  if (data.ok) { alerta.className = "alerta ok"; alerta.textContent = "✅ Partido agregado!"; location.reload(); }
+  else { alerta.className = "alerta error"; alerta.textContent = "❌ Error al guardar"; }
+}
+
+function abrirEditar(id, golesL, golesV) {
+  document.getElementById("edit-id").value = id;
+  document.getElementById("edit-local").value = golesL;
+  document.getElementById("edit-visita").value = golesV;
+  document.getElementById("modal").style.display = "flex";
+}
+
+function cerrarModal() {
+  document.getElementById("modal").style.display = "none";
+}
+
+async function guardarEdicion() {
+  const id = document.getElementById("edit-id").value;
+  const body = {
+    goles_local: parseInt(document.getElementById("edit-local").value),
+    goles_visita: parseInt(document.getElementById("edit-visita").value),
+    estado: document.getElementById("edit-estado").value
+  };
+  const res = await fetch(`/admin/colombia/partido/${id}`, {method:"PUT", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)});
+  const data = await res.json();
+  if (data.ok) { cerrarModal(); location.reload(); }
+}
+
+async function marcarLive(id) {
+  await fetch(`/admin/colombia/partido/${id}`, {method:"PUT", headers:{"Content-Type":"application/json"}, body: JSON.stringify({goles_local:0, goles_visita:0, estado:"en vivo"})});
+  location.reload();
+}
+
+async function marcarFinal(id) {
+  const golesL = prompt("Goles equipo local:");
+  const golesV = prompt("Goles equipo visita:");
+  if (golesL === null || golesV === null) return;
+  await fetch(`/admin/colombia/partido/${id}`, {method:"PUT", headers:{"Content-Type":"application/json"}, body: JSON.stringify({goles_local:parseInt(golesL), goles_visita:parseInt(golesV), estado:"finalizado"})});
+  location.reload();
+}
+
+async function actualizarTabla(id) {
+  const body = {
+    pj: parseInt(document.getElementById(`pj-${id}`).value),
+    gan: parseInt(document.getElementById(`gan-${id}`).value),
+    emp: parseInt(document.getElementById(`emp-${id}`).value),
+    per: parseInt(document.getElementById(`per-${id}`).value),
+    gf: parseInt(document.getElementById(`gf-${id}`).value),
+    gc: parseInt(document.getElementById(`gc-${id}`).value),
+    pts: parseInt(document.getElementById(`pts-${id}`).value),
+  };
+  const res = await fetch(`/admin/colombia/tabla/${id}`, {method:"PUT", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)});
+  const data = await res.json();
+  if (data.ok) alert("✅ Tabla actualizada!");
+}
+</script>
+</body>
+</html>
